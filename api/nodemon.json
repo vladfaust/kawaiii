@@ -1,0 +1,9 @@
+{
+  "watch": [
+    "src",
+    "abi",
+    ".env"
+  ],
+  "ext": "*",
+  "exec": "pnpm run dev:build && pnpm run start"
+}

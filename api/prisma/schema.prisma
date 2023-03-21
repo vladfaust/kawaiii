@@ -1,0 +1,177 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id // Nanoid
+
+  handle     String? @unique
+  name       String?
+  bio        String?
+  evmAddress Bytes   @unique @map("address")
+
+  bgpVersion Int @default(0)
+  pfpVersion Int @default(0)
+
+  createdAt DateTime @default(now())
+
+  Followers Follow[] @relation("Followers")
+  Followees Follow[] @relation("Followees")
+
+  CreatedCollectibles Collectible[]
+  Likes               Like[]
+
+  CollectibleCreateEvents       CollectibleCreateEvent[]
+  CollectibleMintEvents         CollectibleMintEvent[]
+  CollectibleTransferFromEvents CollectibleTransferEvent[] @relation("TransferFrom")
+  CollectibleTransferToEvents   CollectibleTransferEvent[] @relation("TransferTo")
+  CollectibleBalances           CollectibleBalance[]
+}
+
+model Follow {
+  followerId String
+  followeeId String
+
+  createdAt DateTime @default(now())
+
+  Follower User @relation(name: "Followers", fields: [followerId], references: [id])
+  Followee User @relation(name: "Followees", fields: [followeeId], references: [id])
+
+  @@id([followerId, followeeId])
+}
+
+model Collectible {
+  id Bytes @id // Token ID
+
+  creatorId String
+
+  name        String
+  description String?
+  mintPrice   Bytes // In wei // TODO: Change to BigInt
+  editions    Int
+  royalty     Int // 0-255
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Creator User                 @relation(fields: [creatorId], references: [id])
+  Content CollectibleContent[]
+  Likes   Like[]
+
+  CreateEvent    CollectibleCreateEvent?
+  MintEvents     CollectibleMintEvent[]
+  TransferEvents CollectibleTransferEvent[]
+  Balances       CollectibleBalance[]
+}
+
+enum CollectibleContentType {
+  Image
+}
+
+model CollectibleContent {
+  id Int @id @default(autoincrement())
+
+  collectibleId Bytes
+
+  type  CollectibleContentType
+  name  String // File name
+  size  Int // In bytes
+  gated Boolean
+
+  Collectible Collectible @relation(fields: [collectibleId], references: [id])
+
+  @@unique([collectibleId, name])
+}
+
+model CollectibleBalance {
+  userId        String
+  collectibleId Bytes
+
+  balance BigInt
+
+  updatedAt DateTime @updatedAt
+
+  User        User        @relation(fields: [userId], references: [id])
+  Collectible Collectible @relation(fields: [collectibleId], references: [id])
+
+  @@id([userId, collectibleId])
+}
+
+model Like {
+  userId        String
+  collectibleId Bytes
+
+  createdAt DateTime @default(now())
+
+  User        User        @relation(fields: [userId], references: [id])
+  Collectible Collectible @relation(fields: [collectibleId], references: [id])
+
+  @@id([userId, collectibleId])
+}
+
+model CollectibleCreateEvent {
+  creatorId     String
+  collectibleId Bytes  @unique
+
+  blockNumber Int
+  logIndex    Int
+  txHash      String
+
+  createdAt DateTime @default(now()) // Block timestamp
+
+  Creator     User        @relation(fields: [creatorId], references: [id])
+  Collectible Collectible @relation(fields: [collectibleId], references: [id])
+
+  @@id([blockNumber, logIndex])
+}
+
+model CollectibleMintEvent {
+  toId          String
+  collectibleId Bytes
+
+  blockNumber Int
+  logIndex    Int
+  txHash      String
+
+  amount   BigInt
+  income   BigInt
+  ownerFee BigInt
+  profit   BigInt
+
+  createdAt DateTime @default(now()) // Block timestamp
+
+  To          User        @relation(fields: [toId], references: [id])
+  Collectible Collectible @relation(fields: [collectibleId], references: [id])
+
+  @@id([blockNumber, logIndex])
+}
+
+model CollectibleTransferEvent {
+  fromId        String? // Null if minted
+  toId          String? // Null if burned
+  collectibleId Bytes
+
+  blockNumber Int
+  logIndex    Int
+  subIndex    Int
+  txHash      String
+
+  value BigInt
+
+  createdAt DateTime @default(now()) // Block timestamp
+
+  From        User?       @relation(name: "TransferFrom", fields: [fromId], references: [id])
+  To          User?       @relation(name: "TransferTo", fields: [toId], references: [id])
+  Collectible Collectible @relation(fields: [collectibleId], references: [id])
+
+  @@id([blockNumber, logIndex, subIndex])
+}

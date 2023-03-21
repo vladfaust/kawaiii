@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .btn {
+    @apply flex items-center justify-center rounded-lg border border-black border-opacity-10 py-2 px-3 text-center font-bold leading-none;
+    @apply disabled_cursor-not-allowed disabled_opacity-50;
+    @apply pressable cursor-pointer select-none transition;
+  }
+
+  .btn-raised {
+    @apply shadow;
+    @apply active_shadow-none;
+  }
+
+  .btn-square {
+    @apply py-2 px-2;
+  }
+
+  .btn-square.btn-sm {
+    @apply py-1 px-1;
+  }
+
+  .btn-base {
+    @apply bg-base-500 text-white;
+  }
+
+  .btn-primary {
+    @apply bg-blue-500 text-white;
+  }
+
+  .btn-success {
+    @apply bg-success-500 text-white;
+  }
+
+  .btn-error {
+    @apply bg-error-500 text-white;
+  }
+
+  .btn-web3 {
+    @apply bg-x2 bg-web3 animate-bg-position text-white;
+  }
+
+  .btn-nft {
+    @apply bg-x2 bg-nft animate-bg-position text-white;
+  }
+
+  .btn-sm {
+    @apply text-sm leading-none;
+  }
+
+  .btn-lg {
+    @apply py-3 px-4 text-lg leading-none;
+  }
+}
+
+@layer utilities {
+  .pressable {
+    @apply active_scale-95;
+    @apply disabled_active_scale-100;
+  }
+
+  .pressable-wide {
+    @apply active_scale-y-95 active_scale-x-[0.975];
+    @apply disabled_active_scale-y-100 disabled_active_scale-x-100;
+  }
+
+  .bg-x2 {
+    @apply bg-[length:200%_200%];
+  }
+
+  .bg-nft {
+    @apply bg-gradient-to-tr from-blue-500 to-cyan-500;
+  }
+
+  .bg-web3 {
+    @apply bg-gradient-to-tr from-purple-500 to-pink-500;
+  }
+
+  .absolute-centered {
+    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+  }
+
+  .link {
+    @apply underline;
+  }
+
+  .link-hover {
+    @apply hover_underline;
+  }
+
+  .bg-checkerboard {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 8 8'%3E%3Cg fill='black' fill-opacity='0.1'%3E%3Cpath fill-rule='evenodd' d='M0 0h4v4H0V0zm4 4h4v4H4V4z'/%3E%3C/g%3E%3C/svg%3E");
+  }
+}
