@@ -16,7 +16,7 @@ import FolloweesModal from "./Profile/FolloweesModal.vue";
 import { toUint8Array } from "@/util";
 import Placeholder from "./util/Placeholder.vue";
 import { useImage } from "@vueuse/core";
-import { CheckBadgeIcon } from "@heroicons/vue/24/solid";
+import { CheckBadgeIcon } from "@heroicons/vue/20/solid";
 
 const { user } = defineProps<{
   user: Deferred<User | null>;
@@ -253,29 +253,32 @@ const tab = ref(Tab.Created);
           h2.shrink-0.text-xl.font-semibold Collectibles 🧸
           .h-px.w-full.bg-base-100
 
-        .flex.justify-between.overflow-hidden
+        .flex.justify-between.gap-4.overflow-hidden.border-b
           .tab.group.cursor-pointer(
+            v-tippy="{ content: 'Collectibles created' }"
             :class="{ active: tab == Tab.Created }"
             @click="tab = Tab.Created"
           )
-            button
-              span.hidden.sm_inline Created ({{ created.length }})&nbsp;
-              | ✨
+            button.flex.justify-center.gap-2
+              span.hidden.sm_inline Created
+              span ✨
           .tab.group.cursor-pointer(
+            v-tippy="{ content: 'Collectibles liked' }"
             :class="{ active: tab == Tab.Liked }"
             @click="tab = Tab.Liked"
           )
-            button
-              span.hidden.sm_inline Liked ({{ liked.length }})&nbsp;
-              | ❤️
+            button.flex.justify-center.gap-2
+              span.hidden.sm_inline Liked
+              span ❤️
           .tab.group.cursor-pointer(
             v-if="isSelf"
+            v-tippy="{ content: 'Collectibles collected (private)' }"
             :class="{ active: tab == Tab.Collected }"
             @click="tab = Tab.Collected"
           )
-            button
-              span.hidden.sm_inline Collected ({{ collected.length }})&nbsp;
-              | 💎
+            button.flex.justify-center.gap-2
+              span.hidden.sm_inline Collected
+              span 💎
 
         .flex.flex-col.gap-4(v-if="tab == Tab.Created")
           CollectiblePost.w-full.rounded-lg.border(
@@ -287,9 +290,11 @@ const tab = ref(Tab.Created);
             @choose-content="(e) => { setGallery(created, collectible, e); }"
           )
           p.p-8.text-center.text-lg.leading-snug.text-base-500(v-else)
-            span.font-bold {{ user.value.name || "This user" }}
+            span(v-if="isSelf") You
+            span.font-bold(v-else-if="user.value.name") {{ user.value.name }}
+            span(v-else) This user
             |
-            | hasn't created anything yet. ✨
+            | {{  (isSelf ? "haven't" : "hasn't")  }} created anything yet. 🤔
 
         .flex.flex-col.items-center.gap-4(v-else-if="tab == Tab.Liked")
           CollectiblePost.w-full.rounded-lg.border(
@@ -301,9 +306,11 @@ const tab = ref(Tab.Created);
             @choose-content="(e) => { setGallery(liked, collectible, e); }"
           )
           p.p-8.text-center.text-lg.leading-snug.text-base-500(v-else)
-            span.font-bold {{ user.value.name || "This user" }}
+            span(v-if="isSelf") You
+            span.font-bold(v-else-if="user.value.name") {{ user.value.name }}
+            span(v-else) This user
             |
-            | hasn't liked anything yet. ❤️
+            | {{  (isSelf ? "haven't" : "hasn't")  }} liked anything yet. 💔
 
         .flex.flex-col.items-center.gap-4(v-else-if="tab == Tab.Collected")
           CollectiblePost.w-full.rounded-lg.border(

@@ -39,9 +39,11 @@ header.flex.h-16.w-full.place-content-center.border-b.px-4
     ul.flex.items-center.justify-end.gap-4
       template(v-if="userId")
         li.h-full
-          RouterLink._link.relative(:to="{ name: 'NewCollectible' }")
-            //- .absolute.top-1.-right-1.rounded.bg-green-500.px-1.text-xs.text-white.shadow Free!
-            span Create ✨
+          RouterLink._link.relative.flex.justify-center.gap-2(
+            :to="{ name: 'NewCollectible' }"
+          )
+            span.hidden.sm_inline Create
+            span ✨
         li.h-full(v-if="user")
           RouterLink._link.gap-2(:to="{ name: 'Me' }")
             PFP.h-8.rounded-full(:user="user" :key="user.id")

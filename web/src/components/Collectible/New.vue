@@ -60,7 +60,7 @@ function onDrop(files: File[] | null) {
         file,
         id: nanoid(),
         url: URL.createObjectURL(file),
-        gated: true,
+        gated: false,
       }))
     );
   } else {
@@ -83,7 +83,7 @@ watch(
           file: files[i],
           id: nanoid(),
           url: URL.createObjectURL(files[i]),
-          gated: true,
+          gated: false,
         });
       }
     }
@@ -312,6 +312,8 @@ async function create() {
   } catch (e) {
     alert("Failed to create collectible. See the console for details.");
     console.error(e);
+    createDialog.value = false;
+    createStage.value = CreateStage.WaitingForSignature;
   }
 }
 function reload() {
@@ -338,6 +340,9 @@ async function uploadFile(
 
 <template lang="pug">
 .flex.w-full.max-w-3xl.flex-col.gap-3
+  .flex.items-center.gap-2
+    h1.shrink-0.text-lg.font-bold Create a new collectible 🧸✨
+    .h-px.w-full.bg-base-100
   .grid.w-full.gap-3.sm_grid-cols-3
     .flex.flex-col.gap-3
       .flex.items-center.gap-2
@@ -434,7 +439,7 @@ async function uploadFile(
         span.shrink-0.leading-none 50%
 
   .flex.w-full.items-center.gap-2
-    label.label.shrink-0 Content 😻
+    label.label.shrink-0 Content 📁
     .h-px.w-full.bg-base-100
     span.shrink-0.leading-none.text-base-300 {{ content.length }} / {{ MAX_CONTENT_FILES }}, {{ prettyBytes(totalContentFileSize, { binary: true }) }} / {{ prettyBytes(MAX_TOTAL_CONTENT_FILE_SIZE, { binary: true }) }}
 
@@ -467,16 +472,16 @@ async function uploadFile(
     span.select-none.text-base-400(v-if="!draggedContent") Drop files here
     span.select-none.text-base-400(v-else) 🗑 Drop here to remove
 
-  button.btn.btn-primary.btn-lg.w-full.p-3(@click="create") ✨ Create collectible ✨
+  button.btn.btn-primary.btn-lg.w-full.p-3(@click="create") Create collectible 🪄✨
 
   p.text-center.text-sm.leading-tight.text-base-500
-    | Creating a collectible implies signing a gasless transaction with your crypto wallet.
+    | You will be asked to sign a gasless transaction with your crypto wallet, which is completely free.
+    br
     | You will
     |
-    strong.text-green-500 NOT
+    strong NOT
     |
-    | be charged network fees for the signature.
-    | All sales incur a 10% marketplace fee to the platform.
+    | be charged any fees for the signature.
 
   Dialog.relative.z-50(:open="createDialog")
     .fixed.inset-0(class="bg-black/30" aria-hidden="true")
