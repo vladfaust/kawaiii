@@ -4,6 +4,7 @@ import { trpc } from "@/services/api";
 import { shallowRef } from "vue";
 import PFP from "@/components/PFP.vue";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/vue";
+import { CheckBadgeIcon } from "@heroicons/vue/20/solid";
 
 defineProps<{ open: boolean }>();
 
@@ -59,7 +60,13 @@ Dialog.relative.z-50(:open="open" @close="emit('close')")
             )
               PFP.h-12.rounded-full(:user="followee")
               .flex.flex-col(class="gap-0.5")
-                .font-semibold.leading-none.tracking-wide {{ followee.name }}
+                span.font-semibold.leading-none.tracking-wide
+                  | {{ followee.name }}
+                  CheckBadgeIcon.inline-block.h-4.align-top.text-blue-500(
+                    v-if="followee.verified"
+                    class="ml-0.5"
+                    v-tippy="{ content: 'Verified' }"
+                  )
                 .text-sm.leading-none.text-base-500 @{{ followee.handle }}
             .h-px.w-full.bg-base-100
             .flex.shrink-0

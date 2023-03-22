@@ -11,6 +11,7 @@ import PFP from "@/components/PFP.vue";
 import { trpc } from "@/services/api";
 import { toHex } from "@/util";
 import Placeholder from "../util/Placeholder.vue";
+import { CheckBadgeIcon } from "@heroicons/vue/20/solid";
 
 const { collectible, showGallery } = defineProps<{
   collectible: Collectible;
@@ -86,7 +87,13 @@ async function unlike() {
         .flex.flex-col.justify-center.group-hover_underline(class="gap-0.5")
           span.font-bold.leading-none.tracking-wide(
             v-if="collectible.creator.value.name"
-          ) {{ collectible.creator.value.name }}
+          )
+            | {{ collectible.creator.value.name }}
+            CheckBadgeIcon.inline-block.h-4.align-top.text-blue-500(
+              v-if="collectible.creator.value.verified"
+              v-tippy="{ content: 'Verified' }"
+              class="ml-0.5"
+            )
           span.font-bold.leading-none.tracking-wide.text-base-400(v-else) Undefined
 
           span.text-sm.leading-none.text-base-500(
