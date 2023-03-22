@@ -52,6 +52,7 @@ export default class User {
   private static fromData(data: {
     id: string;
     handle: string | null;
+    verified: boolean;
     name: string | null;
     bio: string | null;
     pfpVersion: number;
@@ -61,6 +62,7 @@ export default class User {
       new User(
         data.id,
         data.handle ?? "",
+        data.verified,
         data.name ?? "",
         data.bio ?? "",
         data.pfpVersion,
@@ -72,6 +74,7 @@ export default class User {
   private constructor(
     readonly id: string,
     readonly handle: string,
+    readonly verified: boolean,
     readonly name: string,
     readonly bio: string,
     readonly pfpVersion: number,

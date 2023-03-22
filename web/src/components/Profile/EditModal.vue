@@ -34,6 +34,7 @@ const handleValid = computed(
   () =>
     !handle.value || (handle.value.match(HANDLE_REGEX) && handleAvailable.value)
 );
+const handleChanged = computed(() => handle.value !== user.handle);
 const handleAvailableCheckInProgress = ref(false);
 const handleAvailable = computedAsync(
   async () => {
@@ -253,21 +254,29 @@ Dialog.relative.z-50(:open="open" @close="emit('close')")
             :class="{ 'border-red-500': !handleValid }"
           )
           p.rounded-lg.rounded-tl-none.border.bg-base-50.px-3.py-2.leading-tight(
+            v-if="handleChanged && user.verified"
+          )
+            | ⚠️ Changing the handle would remove verification.
+          p.rounded-lg.rounded-tl-none.border.bg-base-50.px-3.py-2.leading-tight(
             v-if="!handle"
           )
-            | 💁‍♂️ Without a handle, your profile won't be visible
+            | 💁‍♂️ Without a handle, your profile won't be visible.
           p.rounded-lg.rounded-tl-none.border.bg-base-50.px-3.py-2.leading-tight(
-            v-else-if="handle && handle.length < HANDLE_MIN"
+            v-else-if="handle.length < HANDLE_MIN"
           )
-            | 💁‍♂️ The handle must be at least {{ HANDLE_MIN }} characters
+            | 🚫 The handle must be at least {{ HANDLE_MIN }} characters.
+          p.rounded-lg.rounded-tl-none.border.bg-base-50.px-3.py-2.leading-tight(
+            v-else-if="handle.length > HANDLE_MAX"
+          )
+            | 🚫 The handle must be at most {{ HANDLE_MAX }} characters.
           p.rounded-lg.rounded-tl-none.border.bg-base-50.px-3.py-2.leading-tight(
             v-else-if="!handle.match(HANDLE_REGEX)"
           )
-            | 💁‍♂️ The handle must contain lowercase letters, numbers, and underscores (_) only, and begin with a letter.
+            | 🚫 The handle must contain lowercase letters, numbers, and underscores (_) only, and begin with a letter.
           p.rounded-lg.rounded-tl-none.border.bg-base-50.px-3.py-2.leading-tight(
             v-else-if="!handleAvailable"
           )
-            | 💁‍♂️ This handle is not available
+            | 🚫 This handle is not available.
 
           .flex.items-center.justify-between.gap-2
             label.label.shrink-0.leading-none Bio

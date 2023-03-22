@@ -5,6 +5,7 @@ import { TRPCError } from "@trpc/server";
 
 const prisma = new PrismaClient();
 
+// TODO: Should not return anything.
 export default protectedProcedure
   .input(
     z.object({
@@ -25,16 +26,20 @@ export default protectedProcedure
       });
     }
 
+    const verified = input.handle !== undefined ? false : undefined;
+
     const user = await prisma.user.update({
       where: { id: ctx.user.id },
       data: {
         handle: input.handle,
+        verified,
         name: input.name,
         bio: input.bio,
       },
       select: {
         id: true,
         handle: true,
+        verified: true,
         name: true,
         bio: true,
         pfpVersion: true,

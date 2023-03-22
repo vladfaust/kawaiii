@@ -14,7 +14,9 @@ datasource db {
 model User {
   id String @id // Nanoid
 
-  handle     String? @unique
+  handle   String? @unique
+  verified Boolean @default(false)
+
   name       String?
   bio        String?
   evmAddress Bytes   @unique @map("address")

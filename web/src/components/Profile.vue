@@ -16,6 +16,7 @@ import FolloweesModal from "./Profile/FolloweesModal.vue";
 import { toUint8Array } from "@/util";
 import Placeholder from "./util/Placeholder.vue";
 import { useImage } from "@vueuse/core";
+import { CheckBadgeIcon } from "@heroicons/vue/24/solid";
 
 const { user } = defineProps<{
   user: Deferred<User | null>;
@@ -183,13 +184,17 @@ const tab = ref(Tab.Created);
 
           .flex.flex-col.gap-2
             .flex.flex-col.gap-1
-              span.items-center.leading-none
+              span.leading-none
                 span.text-xl.font-bold.leading-none.tracking-wide(
                   v-if="user.value.name"
                 ) {{ user.value.name }}
                 span.text-xl.font-bold.leading-none.tracking-wide.text-base-400(
                   v-else
                 ) Anonymous
+                CheckBadgeIcon.inline-block.h-5.align-text-top.text-blue-500(
+                  v-if="user.value.verified"
+                  v-tippy="{ content: 'Verified' }"
+                )
                 span.leading-none.text-base-400(v-if="user.value.id == userId") &nbsp;(you)
 
               span.text.leading-none.text-base-500(v-if="user.value.handle") @{{ user.value.handle }}
