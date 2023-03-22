@@ -1,2 +1,2 @@
-web: pnpm start
-release: pnpm exec prisma migrate deploy
+web: npm start
+release: npm exec prisma migrate deploy

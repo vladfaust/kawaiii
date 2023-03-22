@@ -6,7 +6,8 @@
   "license": "UNLICENSED",
   "type": "module",
   "engines": {
-    "node": "18"
+    "node": "18",
+    "npm": "8"
   },
   "scripts": {
     "dev": "vite",
@@ -16,6 +17,8 @@
   "dependencies": {
     "@headlessui/vue": "^1.7.12",
     "@heroicons/vue": "^2.0.16",
+    "@kawaiii/api": "file:../api",
+    "@kawaiii/contracts": "file:../contracts",
     "@kyvg/vue3-notification": "^2.9.0",
     "@trpc/client": "^10.11.1",
     "@trpc/server": "^10.16.0",

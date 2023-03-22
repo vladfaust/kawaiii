@@ -6,12 +6,13 @@
   "license": "UNLICENSED",
   "type": "module",
   "engines": {
-    "node": "18"
+    "node": "18",
+    "npm": "8"
   },
   "scripts": {
     "clean": "rm -r artifacts cache dist typechain",
     "typechain": "typechain --target ethers-v5 \"artifacts/**/*.sol/!(*.dbg).json\" --out-dir typechain --discriminate-types",
-    "build": "hardhat compile && pnpm run typechain && tsc",
+    "build": "hardhat compile && npm run typechain && tsc",
     "deploy:dev": "hardhat run scripts/deploy.js --network dev",
     "deploy:prod": "hardhat run scripts/deploy.js --network prod",
     "node": "hardhat node"
@@ -28,7 +29,7 @@
     "@typechain/ethers-v5": "^10.2.0",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
-    "hardhat": "2.12.0-esm.1",
+    "hardhat": "^2.13.0",
     "typechain": "^8.1.1",
     "typescript": "^4.9.5"
   },
