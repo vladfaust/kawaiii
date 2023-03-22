@@ -269,13 +269,13 @@ const tab = ref(Tab.Created);
               span.hidden.sm_inline Liked ({{ liked.length }})&nbsp;
               | ❤️
           .tab.group.cursor-pointer(
+            v-if="isSelf"
             :class="{ active: tab == Tab.Collected }"
             @click="tab = Tab.Collected"
           )
-            button(v-tippy="'Collected'")
+            button
               span.hidden.sm_inline Collected ({{ collected.length }})&nbsp;
               | 💎
-              //- span.sm_hidden &nbsp;({{ collected.length }})
 
         .flex.flex-col.gap-4(v-if="tab == Tab.Created")
           CollectiblePost.w-full.rounded-lg.border(
@@ -315,9 +315,7 @@ const tab = ref(Tab.Created);
             @choose-content="(e) => { setGallery(collected, collectible, e); }"
           )
           p.p-8.text-center.text-lg.leading-snug.text-base-500(v-else)
-            span.font-bold {{ user.value.name || "This user" }}
-            |
-            | hasn't collected anything yet. 💎
+            span You haven't collected anything yet. 💁‍♂️
 
       GalleryModal(
         :open="galleryCollectible !== undefined"
