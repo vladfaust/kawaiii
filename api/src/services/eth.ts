@@ -4,8 +4,6 @@ import { timeout } from "@/utils.js";
 import assert from "assert";
 import konsole from "./konsole";
 import { ERC1155__factory } from "@kawaiii/contracts/typechain";
-import { Hex, Address } from "@/schema";
-import { z } from "zod";
 
 export let provider: ethers.providers.BaseProvider;
 

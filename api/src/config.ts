@@ -30,10 +30,6 @@ class S3 {
   ) {}
 }
 
-class OffchainCafe {
-  constructor(readonly serverHost: string, readonly serverPort: number) {}
-}
-
 class Config {
   constructor(
     readonly prod: boolean,
@@ -41,8 +37,7 @@ class Config {
     readonly redisUrl: URL,
     readonly server: Server,
     readonly eth: Eth,
-    readonly s3: S3,
-    readonly offchainCafe: OffchainCafe
+    readonly s3: S3
   ) {}
 }
 
@@ -72,10 +67,6 @@ const config = new Config(
     new URL(requireEnv("S3_ENDPOINT")),
     requireEnv("S3_REGION"),
     requireEnv("S3_BUCKET")
-  ),
-  new OffchainCafe(
-    requireEnv("OFFCHAIN_CAFE_SERVER_HOST"),
-    parseInt(requireEnv("OFFCHAIN_CAFE_SERVER_PORT"))
   )
 );
 

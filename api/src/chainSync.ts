@@ -1,5 +1,3 @@
-import { gql } from "@urql/core";
-import offchainCafe from "@/services/offchainCafe";
 import { KawaiiiCollectible__factory } from "@kawaiii/contracts/typechain";
 import {
   TransferSingleEvent,
@@ -12,20 +10,10 @@ import { toBuffer, toHex } from "./utils";
 import { BigNumber, ethers } from "ethers";
 import { PrismaClient } from "@prisma/client";
 import { nanoid } from "nanoid";
-import * as wonka from "wonka";
+import { provider } from "./services/eth";
+import redis from "@/services/redis";
 
-type Log = {
-  block: {
-    number: number;
-    timestamp: number;
-  };
-  logIndex: number;
-  transaction: {
-    hash: string;
-  };
-  data: string;
-  topics: string[];
-};
+type Log = ethers.providers.Log;
 
 type BaseEvent = {
   blockNumber: number;
@@ -69,40 +57,23 @@ type CollectibleTransferEventData = BaseEvent & {
   value: bigint;
 };
 
-const LATEST_BLOCK_GQL = gql`
-  query {
-    meta {
-      chain {
-        latestBlock {
-          number
-        }
-      }
-    }
+async function blockTimestamp(blockNumber: number): Promise<Date> {
+  const cachedTimestamp = await redis.get(`block:${blockNumber}:timestamp`);
+
+  if (cachedTimestamp) {
+    return new Date(parseInt(cachedTimestamp) * 1000);
+  } else {
+    const block = await provider.getBlock(blockNumber);
+    const timestamp = block.timestamp;
+    await redis.set(`block:${blockNumber}:timestamp`, timestamp);
+    return new Date(timestamp * 1000);
   }
-`;
+}
 
 async function ensureUser(address: string): Promise<string> {
   const evmAddress = toBuffer(address);
 
-  // const user = await prisma.$transaction(async (prisma) => {
-  //   let user = await prisma.user.findUnique({
-  //     where: { evmAddress },
-  //     select: { id: true },
-  //   });
-
-  //   if (!user) {
-  //     user = await prisma.user.create({
-  //       data: {
-  //         id: nanoid(),
-  //         evmAddress,
-  //       },
-  //       select: { id: true },
-  //     });
-  //   }
-
-  //   return user;
-  // });
-
+  // FIXME: Turn it into a transaction.
   try {
     const user = await prisma.user.upsert({
       where: { evmAddress },
@@ -123,60 +94,10 @@ async function ensureUser(address: string): Promise<string> {
   }
 }
 
-function logsGql(topic: string) {
-  return gql`query ContractLogs(
-    $fromBlock: Int!,
-    $toBlock: Int!
-  ) {
-    contract(address: "${toHex(config.eth.collectibleContractAddress)}") {
-      logs(
-        topics: [["${topic}"]],
-        limit: 10,
-        fromBlock: $fromBlock,
-        toBlock: $toBlock
-      ) {
-          block {
-            number
-            timestamp
-          }
-          logIndex
-          transaction {
-            hash
-          }
-          data
-          topics
-      }
-    }
-  }`;
-}
-
-function subscriptionGql(topic: string) {
-  return gql`
-    subscription {
-      log(
-        contractAddress: "${toHex(config.eth.collectibleContractAddress)}",
-        topics: [["${topic}"]]
-      ) {
-        block {
-          number
-          timestamp
-        }
-        logIndex
-        transaction {
-          hash
-        }
-        data
-        topics
-      }
-    }`;
-}
-
 const iface = KawaiiiCollectible__factory.createInterface();
 const prisma = new PrismaClient();
 
-const latestChainBlockNumber = (
-  await offchainCafe.query(LATEST_BLOCK_GQL, {}).toPromise()
-).data.meta.chain.latestBlock.number as number;
+const latestChainBlockNumber = await provider.getBlockNumber();
 
 async function syncHistoricalEvents<T extends BaseEvent>(
   topic: string,
@@ -191,14 +112,12 @@ async function syncHistoricalEvents<T extends BaseEvent>(
   while (fromBlock < latestChainBlockNumber) {
     console.log(`Querying historical logs from block ${fromBlock}`);
 
-    const logs: Log[] = (
-      await offchainCafe
-        .query(logsGql(topic), {
-          fromBlock,
-          toBlock: latestChainBlockNumber,
-        })
-        .toPromise()
-    ).data.contract.logs;
+    const logs = await provider.getLogs({
+      fromBlock,
+      toBlock: latestChainBlockNumber,
+      address: toHex(config.eth.collectibleContractAddress),
+      topics: [[topic]],
+    });
 
     if (!logs.length) {
       console.log("No historical logs found");
@@ -209,7 +128,7 @@ async function syncHistoricalEvents<T extends BaseEvent>(
     if (
       !logs.find(
         (l) =>
-          l.block.number != fromBlock ||
+          l.blockNumber != fromBlock ||
           !logIndicesFromTheLatestBlock.includes(l.logIndex)
       )
     ) {
@@ -223,20 +142,14 @@ async function syncHistoricalEvents<T extends BaseEvent>(
 
     if (events.length) {
       console.log(`Saving ${events.length} historical events`, events);
-
       await createManyFn(events);
-      // await prisma.onChainEnergyPurchase.createMany({
-      //   data: events,
-      //   skipDuplicates: true,
-      // });
-
       latestEventBlockNumber = events[events.length - 1].blockNumber;
     }
 
-    fromBlock = logs[logs.length - 1].block.number;
+    fromBlock = logs[logs.length - 1].blockNumber;
 
     logIndicesFromTheLatestBlock = logs
-      .filter((l) => l.block.number == fromBlock)
+      .filter((l) => l.blockNumber == fromBlock)
       .map((l) => l.logIndex);
   }
 }
@@ -246,21 +159,24 @@ async function subscribeToRealtimeEvents<T>(
   logMapFn: (log: Log) => Promise<T[]>,
   createManyFn: (events: T[]) => Promise<void>
 ) {
-  const { unsubscribe } = wonka.pipe(
-    offchainCafe.subscription(subscriptionGql(topic), {}),
-    wonka.subscribe(async (result) => {
-      const log: Log | undefined = result.data?.log;
-      if (!log) throw new Error("No data received");
-
+  provider.on(
+    { address: toHex(config.eth.collectibleContractAddress), topics: [topic] },
+    async (log) => {
       const events = await logMapFn(log);
+
       if (events.length) {
-        console.log(`Saving realtime events`, events);
-        createManyFn(events);
+        console.log(`Saving ${events.length} realtime events`, events);
+        await createManyFn(events);
       }
-    })
+    }
   );
 
-  return unsubscribe;
+  return () => {
+    provider.off({
+      address: toHex(config.eth.collectibleContractAddress),
+      topics: [topic],
+    });
+  };
 }
 
 async function syncCreateEvents() {
@@ -271,10 +187,10 @@ async function syncCreateEvents() {
       {
         creatorId: await ensureUser(parsed.args.creator),
         collectibleId: toBuffer(parsed.args.tokenId),
-        blockNumber: log.block.number,
+        blockNumber: log.blockNumber,
         logIndex: log.logIndex,
-        txHash: log.transaction.hash,
-        createdAt: new Date(log.block.timestamp * 1000),
+        txHash: log.transactionHash,
+        createdAt: await blockTimestamp(log.blockNumber),
       },
     ];
   };
@@ -318,14 +234,14 @@ async function syncMintEvents() {
       {
         toId: await ensureUser(parsed.args.to),
         collectibleId: toBuffer(parsed.args.tokenId),
-        blockNumber: log.block.number,
+        blockNumber: log.blockNumber,
         logIndex: log.logIndex,
-        txHash: log.transaction.hash,
+        txHash: log.transactionHash,
         amount: parsed.args.amount.toBigInt(),
         income: parsed.args.income.toBigInt(),
         ownerFee: parsed.args.ownerFee.toBigInt(),
         profit: parsed.args.profit.toBigInt(),
-        createdAt: new Date(log.block.timestamp * 1000),
+        createdAt: await blockTimestamp(log.blockNumber),
       },
     ];
   };
@@ -438,12 +354,12 @@ async function syncTransferSingleEvents() {
             ? await ensureUser(parsed.args.to)
             : undefined,
         collectibleId: toBuffer(parsed.args.id),
-        blockNumber: log.block.number,
+        blockNumber: log.blockNumber,
         logIndex: log.logIndex,
         subIndex: 0,
-        txHash: log.transaction.hash,
+        txHash: log.transactionHash,
         value: parsed.args.value.toBigInt(),
-        createdAt: new Date(log.block.timestamp * 1000),
+        createdAt: await blockTimestamp(log.blockNumber),
       },
     ];
   };
@@ -493,12 +409,12 @@ async function syncTransferBatchEvents() {
             ? await ensureUser(parsed.args.to)
             : undefined,
         collectibleId: toBuffer(id),
-        blockNumber: log.block.number,
+        blockNumber: log.blockNumber,
         logIndex: log.logIndex,
         subIndex: index,
-        txHash: log.transaction.hash,
+        txHash: log.transactionHash,
         value: parsed.args.values[index].toBigInt(),
-        createdAt: new Date(log.block.timestamp * 1000),
+        createdAt: await blockTimestamp(log.blockNumber),
       }))
     );
   };
