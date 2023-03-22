@@ -29,7 +29,7 @@ const name = ref<string>(user.name);
 const nameValid = computed(() => name.value.length <= NAME_MAX);
 
 const handle = ref<string>(user.handle);
-const handleDebounced = refDebounced(handle, 1000);
+const handleDebounced = refDebounced(handle, 500);
 const handleValid = computed(
   () =>
     !handle.value || (handle.value.match(HANDLE_REGEX) && handleAvailable.value)
@@ -51,7 +51,7 @@ const handleAvailable = computedAsync(
 
     return false;
   },
-  false,
+  true,
   {
     lazy: true,
     evaluating: handleAvailableCheckInProgress,
