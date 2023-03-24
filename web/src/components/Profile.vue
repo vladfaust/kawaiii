@@ -265,7 +265,6 @@ const tab = ref(Tab.Created);
 
         .flex.justify-between.gap-4.overflow-hidden.border-b
           .tab.group.cursor-pointer(
-            v-tippy="{ content: 'Collectibles created' }"
             :class="{ active: tab == Tab.Created }"
             @click="tab = Tab.Created"
           )
@@ -273,7 +272,6 @@ const tab = ref(Tab.Created);
               span.hidden.sm_inline Created
               span ✨
           .tab.group.cursor-pointer(
-            v-tippy="{ content: 'Collectibles liked' }"
             :class="{ active: tab == Tab.Liked }"
             @click="tab = Tab.Liked"
           )
@@ -282,7 +280,6 @@ const tab = ref(Tab.Created);
               span ❤️
           .tab.group.cursor-pointer(
             v-if="isSelf"
-            v-tippy="{ content: 'Collectibles collected (private)' }"
             :class="{ active: tab == Tab.Collected }"
             @click="tab = Tab.Collected"
           )
