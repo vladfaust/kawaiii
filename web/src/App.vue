@@ -41,3 +41,42 @@ HeaderVue
 FooterVue
 .hidden(class="sm_w-3/5")
 </template>
+
+<style lang="scss">
+.vue-notification-group {
+  @apply z-50 m-3;
+
+  & > span {
+    display: flex !important;
+    @apply flex-col gap-2;
+  }
+}
+
+.vue-notification-wrapper {
+  overflow: inherit !important;
+}
+
+.my-notification {
+  @apply cursor-pointer rounded-lg p-4 drop-shadow-lg;
+
+  & > .notification-title {
+    @apply mb-0.5 text-lg font-bold leading-tight;
+  }
+
+  & > .notification-content {
+    @apply font-medium leading-tight;
+  }
+
+  &.success {
+    @apply bg-success-500 text-white;
+  }
+
+  &.info {
+    @apply bg-primary-500 text-white;
+  }
+
+  &.error {
+    @apply bg-error-500 text-white;
+  }
+}
+</style>

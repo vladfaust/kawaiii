@@ -483,7 +483,7 @@ async function uploadFile(
     |
     | be charged any fees for the signature.
 
-  Dialog.relative.z-50(:open="createDialog")
+  Dialog.relative.z-40(:open="createDialog")
     .fixed.inset-0(class="bg-black/30" aria-hidden="true")
     .fixed.inset-0.overflow-y-auto
       .flex.min-h-full.items-center.justify-center

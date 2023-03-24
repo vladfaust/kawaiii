@@ -66,7 +66,7 @@ async function collect() {
 </script>
 
 <template lang="pug">
-Dialog.relative.z-50(:open="open" @close="emit('close')")
+Dialog.relative.z-40(:open="open" @close="emit('close')")
   .fixed.inset-0(class="bg-black/30" aria-hidden="true")
   .fixed.inset-0.overflow-y-auto.p-4
     .flex.min-h-full.items-center.justify-center

@@ -200,7 +200,7 @@ watchEffect(() => {
 </script>
 
 <template lang="pug">
-Dialog.relative.z-50(:open="open" @close="close")
+Dialog.relative.z-40(:open="open" @close="close")
   .fixed.inset-0(class="bg-black/50" aria-hidden="true")
   .fixed.inset-0.p-4
     .flex.items-center.justify-self-center.shadow-lg(
