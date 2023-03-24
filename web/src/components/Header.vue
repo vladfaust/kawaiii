@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import User from "@/model/User";
-import { explicitLogin, userId } from "@/modules/auth";
+import { userId, loginModal } from "@/modules/auth";
 import { shallowRef, watch } from "vue";
 import PFP from "./PFP.vue";
-import { useRouter } from "vue-router";
 
+// REFACTOR: Move user to the auth store.
 const user = shallowRef<User | undefined>();
-const router = useRouter();
 
 watch(
   () => userId.value,
@@ -21,11 +20,6 @@ watch(
     immediate: true,
   }
 );
-
-async function login() {
-  await explicitLogin();
-  router.push({ name: "Me" });
-}
 </script>
 
 <template lang="pug">
@@ -47,9 +41,14 @@ header.flex.h-16.w-full.place-content-center.border-b.px-4
         li.h-full(v-if="user")
           RouterLink._link.gap-2(:to="{ name: 'Me' }")
             PFP.h-8.rounded-full(:user="user" :key="user.id")
-      li._link.h-full(v-else)
-        button.btn.btn-sm.btn-web3(@click="login")
-          | Login
+      template(v-else)
+        .hidden.sm_contents
+          li._link.h-full.shrink-0
+            button.btn.btn-sm(@click="loginModal = true")
+              | Sign up
+        li._link.h-full.shrink-0
+          button.btn.btn-sm.btn-web3(@click="loginModal = true")
+            | Log in
 </template>
 
 <style lang="scss" scoped>

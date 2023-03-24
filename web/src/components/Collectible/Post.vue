@@ -12,6 +12,7 @@ import { trpc } from "@/services/api";
 import { toHex } from "@/util";
 import Placeholder from "../util/Placeholder.vue";
 import { CheckBadgeIcon } from "@heroicons/vue/20/solid";
+import { loginModal, userId } from "@/modules/auth";
 
 const { collectible, showGallery } = defineProps<{
   collectible: Collectible;
@@ -40,6 +41,7 @@ const creatorLink = computed(() => {
 
 const likeInProgress = ref(false);
 async function like() {
+  if (!checkLoggedIn()) return;
   if (likeInProgress.value) return;
   likeInProgress.value = true;
 
@@ -55,6 +57,7 @@ async function like() {
   }
 }
 async function unlike() {
+  if (!checkLoggedIn()) return;
   if (likeInProgress.value) return;
   likeInProgress.value = true;
 
@@ -68,6 +71,14 @@ async function unlike() {
   } finally {
     likeInProgress.value = false;
   }
+}
+function checkLoggedIn() {
+  if (!userId.value) {
+    loginModal.value = true;
+    return false;
+  }
+
+  return true;
 }
 </script>
 
@@ -104,7 +115,7 @@ async function unlike() {
         span.leading-none {{ collectible.content.length }} photos
         span.text-sm.leading-none.text-base-500 {{ formatDistanceToNow(collectible.createdAt) }} ago
     .flex.flex-col
-      span.text-lg.font-medium.leading-tight {{ collectible.name }}
+      span.text-lg.font-semibold.leading-tight {{ collectible.name }}
       Markdown.leading-tight(
         v-if="collectible.description"
         :source="collectible.description"
@@ -127,7 +138,7 @@ async function unlike() {
           @click="() => (collectible.likedByMe.value ? unlike() : like())"
           :class="collectible.likedByMe.value ? 'bg-yellow-200' : ''"
         ) ❤️ {{ collectible.likes.value }}
-        button.btn.text-base-600(tabindex="-1") 💬 {{ collectible.comments }}
+        button.btn.text-base-600(tabindex="-1" @click="checkLoggedIn") 💬 {{ collectible.comments }}
       .flex.items-center.gap-2
         CollectButton(:collectible="collectible")
 

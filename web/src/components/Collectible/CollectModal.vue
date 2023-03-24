@@ -19,6 +19,7 @@ import config from "@/config";
 import Callout from "@/components/util/Callout.vue";
 import { CheckBadgeIcon } from "@heroicons/vue/20/solid";
 import { notify } from "@kyvg/vue3-notification";
+import { loginModal, userId } from "@/modules/auth";
 
 const { collectible, open } = defineProps<{
   collectible: Collectible;
@@ -28,6 +29,8 @@ const { collectible, open } = defineProps<{
 const emit = defineEmits<{
   (event: "close"): void;
 }>();
+
+const buttonRef = ref<HTMLButtonElement>();
 
 const stage = ref<Stage | undefined>();
 const exclusiveContentLength = computed(
@@ -76,7 +79,11 @@ async function collect() {
 </script>
 
 <template lang="pug">
-Dialog.relative.z-40(:open="open" @close="emit('close')")
+Dialog.relative.z-40(
+  :open="open"
+  @close="emit('close')"
+  :initial-focus="buttonRef"
+)
   .fixed.inset-0(class="bg-black/30" aria-hidden="true")
   .fixed.inset-0.overflow-y-auto.p-4
     .flex.min-h-full.items-center.justify-center
@@ -127,20 +134,28 @@ Dialog.relative.z-40(:open="open" @close="emit('close')")
             | This collectible is sold out.
             | You may try obtaining it on the secondary market.
 
-        button.btn.btn-web3.btn-lg(
-          v-else-if="stage === undefined"
-          @click="collect"
-        )
-          | 🍃 Mint {{ collectible.collected.value ? "more " : "" }}for
-          | {{ ethers.utils.formatEther(collectible.mintPrice) }}
-          | {{ config.eth.chain.nativeCurrency.symbol }}
-        .btn.btn-lg.btn-ghost(v-else)
-          .flex.items-center.gap-2(v-if="stage === Stage.SendingTx")
-            Spinner.h-4.animate-spin
-            span Sending tx...
-          .flex.items-center.gap-2(
-            v-else-if="stage === Stage.WaitingForConfirmation"
+        template(v-else-if="userId")
+          button.btn.btn-web3(
+            v-if="stage === undefined"
+            ref="buttonRef"
+            @click="collect"
           )
-            Spinner.h-4.animate-spin
-            span Waiting confirm...
+            | 🍃 Mint {{ collectible.collected.value ? "more " : "" }}for
+            | {{ ethers.utils.formatEther(collectible.mintPrice) }}
+            | {{ config.eth.chain.nativeCurrency.symbol }}
+          .btn.btn-ghost(v-else)
+            .flex.items-center.gap-2(v-if="stage === Stage.SendingTx")
+              Spinner.h-4.animate-spin
+              span Sending tx...
+            .flex.items-center.gap-2(
+              v-else-if="stage === Stage.WaitingForConfirmation"
+            )
+              Spinner.h-4.animate-spin
+              span Waiting confirm...
+
+        button.btn.btn-primary(
+          v-else
+          ref="buttonRef"
+          @click="loginModal = true"
+        ) Log in to mint
 </template>

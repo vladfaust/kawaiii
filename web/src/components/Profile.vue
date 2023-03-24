@@ -9,7 +9,7 @@ import ContentCard from "./Collectible/Content/Card.vue";
 import CollectiblePost from "./Collectible/Post.vue";
 import Markdown from "vue3-markdown-it";
 import GalleryModal from "./GalleryModal.vue";
-import { logout, userId } from "@/modules/auth";
+import { loginModal, logout, userId } from "@/modules/auth";
 import EditModal from "./Profile/EditModal.vue";
 import PFP from "@/components/PFP.vue";
 import FolloweesModal from "./Profile/FolloweesModal.vue";
@@ -105,6 +105,11 @@ const followeesModal = ref(false);
 
 const followingInProcess = ref(false);
 async function follow() {
+  if (!userId.value) {
+    loginModal.value = true;
+    return;
+  }
+
   followingInProcess.value = true;
 
   try {
@@ -120,6 +125,11 @@ async function follow() {
   }
 }
 async function unfollow() {
+  if (!userId.value) {
+    loginModal.value = true;
+    return;
+  }
+
   followingInProcess.value = true;
 
   try {

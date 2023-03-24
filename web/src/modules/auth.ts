@@ -1,8 +1,12 @@
 import config from "@/config";
 import { rest } from "@/services/api";
-import { autoConnect, connect, provider, disconnect } from "@/services/eth";
+import { autoConnect, provider, disconnect } from "@/services/eth";
 import Web3Token from "web3-token";
 import { useSessionStorage } from "@vueuse/core";
+import { ref } from "vue";
+
+/** The login modal state. */
+export const loginModal = ref(false);
 
 /** The web3 token session storage. */
 export const web3Token = useSessionStorage<string | null>("web3Token", null);
@@ -18,14 +22,6 @@ export async function autoLogin() {
     userId.value = await rest.auth.get();
     console.log("Logged in as", userId.value);
   }
-}
-
-/**
- * Should be called on user action.
- */
-export async function explicitLogin() {
-  await connect();
-  userId.value = await rest.auth.login(await ensureWeb3Token());
 }
 
 /**

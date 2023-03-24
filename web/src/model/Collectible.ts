@@ -9,7 +9,7 @@ import { toHex, toUint8Array } from "@/util";
 import { Deferred } from "@/util/deferred";
 import { Buffer, bufferToUint8Array } from "@/util/prisma";
 import { BigNumber } from "ethers";
-import { computed, markRaw, ref, Ref } from "vue";
+import { computed, markRaw, ref, Ref, watch } from "vue";
 import Content from "./Collectible/Content";
 import User from "./User";
 
@@ -153,8 +153,19 @@ export default class Collectible {
     this.royalty = royalty;
     this.createdAt = createdAt;
     this._content = content;
-    this.fetchBalance();
+
     this.fetchTotalSupply();
     this.fetchLikes();
+
+    // OPTIMIZE: It is not garbage collected?
+    watch(
+      () => account.value,
+      () => {
+        this.fetchBalance();
+      },
+      {
+        immediate: true,
+      }
+    );
   }
 }

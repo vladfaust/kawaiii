@@ -6,6 +6,7 @@ import nProgress from "nprogress";
 import { onMounted } from "vue";
 import { autoConnect } from "./services/eth";
 import Spinner from "./components/util/Spinner.vue";
+import LoginModal from "./components/LoginModal.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -39,6 +40,7 @@ HeaderVue
         template(#fallback)
           Spinner.animate-spin.text-primary-500
 FooterVue
+LoginModal
 .hidden(class="sm_w-3/5")
 </template>
 
