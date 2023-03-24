@@ -408,7 +408,11 @@ onUnmounted(() => {
       .flex.items-center.gap-2
         label.label.shrink-0 Preview 🖼
         .h-px.w-full.bg-base-100
-        span.shrink-0.leading-none.text-base-300 {{ previewImageFile ? prettyBytes(previewImageFile.size, { binary: true }) : 0 }} / {{ prettyBytes(PREVIEW_IMAGE_MAX_SIZE, { binary: true }) }}
+        span.shrink-0.leading-none.text-base-300
+          | {{ previewImageFile ? prettyBytes(previewImageFile.size, { binary: true }) : 0 }} / {{ prettyBytes(PREVIEW_IMAGE_MAX_SIZE, { binary: true }) }}
+          span.cursor-help(
+            v-tippy="{ content: 'The preview image is shown in the collectible list and is used as the thumbnail for the collectible. It should be a square image.' }"
+          ) ❓
       .aspect-square
         img.pressable.aspect-square.h-full.w-full.cursor-pointer.rounded-lg.object-cover.shadow-lg.transition-transform(
           v-if="previewImageUrl"
@@ -449,9 +453,8 @@ onUnmounted(() => {
         label.label.shrink-0 Price ({{ config.eth.chain.nativeCurrency.symbol }}) 🤑
         .h-px.w-full.bg-base-100
         span.shrink-0.cursor-help.leading-none.text-base-200.hover_text-base-400(
-          v-tippy="'For one edition'"
-        )
-          QuestionMarkCircleIcon.h-5
+          v-tippy="'Price for minting a single collectible edition.'"
+        ) ❓
 
       input.input(
         type="number"
@@ -467,9 +470,8 @@ onUnmounted(() => {
         label.label.shrink-0 Editions 💎
         .h-px.w-full.bg-base-100
         span.shrink-0.cursor-help.leading-none.text-base-200.hover_text-base-400(
-          v-tippy="'How many will be ever minted'"
-        )
-          QuestionMarkCircleIcon.h-5
+          v-tippy="'How many collectibles will be ever minted.'"
+        ) ❓
       input.input(
         type="number"
         v-model="editions"
@@ -483,9 +485,8 @@ onUnmounted(() => {
         label.label.shrink-0 Royalty 👑 ({{ Math.round((royalty / 255) * 100) }}%)
         .h-px.w-full.bg-base-100
         span.shrink-0.cursor-help.leading-none.text-base-200.hover_text-base-400(
-          v-tippy="'Royalty from secondary sales'"
-        )
-          QuestionMarkCircleIcon.h-5
+          v-tippy="'Royalty accrued from secondary sales.'"
+        ) ❓
 
       .input.flex.items-center.gap-1
         span.shrink-0.leading-none 0%
@@ -501,7 +502,11 @@ onUnmounted(() => {
   .flex.w-full.items-center.gap-2
     label.label.shrink-0 Content 📁
     .h-px.w-full.bg-base-100
-    span.shrink-0.leading-none.text-base-300 {{ content.length }} / {{ MAX_CONTENT_FILES }}, {{ prettyBytes(totalContentFileSize, { binary: true }) }} / {{ prettyBytes(MAX_TOTAL_CONTENT_FILE_SIZE, { binary: true }) }}
+    span.shrink-0.leading-none.text-base-300
+      | {{ content.length }} / {{ MAX_CONTENT_FILES }}, {{ prettyBytes(totalContentFileSize, { binary: true }) }} / {{ prettyBytes(MAX_TOTAL_CONTENT_FILE_SIZE, { binary: true }) }}
+      span.cursor-help(
+        v-tippy="'Do not include the preview image into content.'"
+      ) ❓
 
   Sortable.grid.w-full.grid-cols-2.gap-3.sm_grid-cols-5(
     :key="content.length"
@@ -532,7 +537,7 @@ onUnmounted(() => {
     span.select-none.text-base-400(v-if="!draggedContent") Drop files here
     span.select-none.text-base-400(v-else) 🗑 Drop here to remove
 
-  button.btn.btn-primary.btn-lg.w-full.p-3(@click="create") Create collectible 🪄✨
+  button.btn.btn-primary.btn-lg(@click="create") Create collectible 🪄✨
 
   p.text-center.text-sm.leading-tight.text-base-500
     | You will be asked to sign a gasless transaction with your crypto wallet, which is completely free.
