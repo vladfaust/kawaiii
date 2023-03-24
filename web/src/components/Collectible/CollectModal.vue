@@ -18,6 +18,7 @@ import CollectibleCard from "./Card.vue";
 import config from "@/config";
 import Callout from "@/components/util/Callout.vue";
 import { CheckBadgeIcon } from "@heroicons/vue/20/solid";
+import { notify } from "@kyvg/vue3-notification";
 
 const { collectible, open } = defineProps<{
   collectible: Collectible;
@@ -54,8 +55,17 @@ async function collect() {
 
     stage.value = Stage.Done;
 
+    notify({
+      title: "Minted! 🎉",
+      text: "The collectible has been added to your wallet.",
+      type: "success",
+      duration: -1,
+    });
+
     collectible.fetchBalance();
     collectible.fetchTotalSupply();
+
+    emit("close");
   } catch (e: any) {
     alert("Error: " + e.message);
     throw e;
