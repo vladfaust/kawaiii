@@ -155,7 +155,7 @@ const tab = ref(Tab.Created);
 </script>
 
 <template lang="pug">
-.flex.w-full.max-w-3xl.flex-col.gap-3
+.m-4.flex.w-full.max-w-3xl.flex-col.gap-3
   template(v-if="user.resolved")
     template(v-if="user.value")
       .flex.flex-col.gap-4

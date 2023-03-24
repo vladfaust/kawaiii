@@ -3,10 +3,11 @@ import HeaderVue from "@/components/Header.vue";
 import FooterVue from "@/components/Footer.vue";
 import { useRoute, useRouter } from "vue-router";
 import nProgress from "nprogress";
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
 import { autoConnect } from "./services/eth";
 import Spinner from "./components/util/Spinner.vue";
 import LoginModal from "./components/LoginModal.vue";
+import { userId } from "./modules/auth";
 
 const route = useRoute();
 const router = useRouter();
@@ -26,12 +27,18 @@ onMounted(() => {
     }
   });
 });
+
+const includeHeader = computed(() => {
+  return userId.value || route.path !== "/";
+});
 </script>
 
 <template lang="pug">
 Notifications(position="top center" classes="my-notification")
-HeaderVue
-.flex.justify-center.p-4(style="min-height: calc(100vh - 8rem)")
+HeaderVue(v-if="includeHeader")
+.flex.justify-center(
+  :style="`min-height: calc(100vh - ${includeHeader ? '8rem' : '0'})`"
+)
   RouterView(v-slot="{ Component }")
     Transition(name="fade" mode="out-in")
       Suspense
@@ -39,7 +46,7 @@ HeaderVue
           Component(:is="Component" :key="route.path")
         template(#fallback)
           Spinner.animate-spin.text-primary-500
-FooterVue
+FooterVue(v-if="includeHeader")
 LoginModal
 .hidden(class="sm_w-3/5")
 </template>

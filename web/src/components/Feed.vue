@@ -33,7 +33,7 @@ const galleryContent = shallowRef<Content | undefined>();
 </script>
 
 <template lang="pug">
-.flex.min-h-full.w-full.max-w-3xl.flex-col.gap-3
+.m-4.flex.min-h-full.w-full.max-w-3xl.flex-col.gap-3
   Post.rounded-xl.border(
     v-if="feed.length > 0"
     v-for="collectible in feed"

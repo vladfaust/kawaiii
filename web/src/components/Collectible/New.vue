@@ -399,7 +399,7 @@ onUnmounted(() => {
 </script>
 
 <template lang="pug">
-.flex.w-full.max-w-3xl.flex-col.gap-3
+.m-4.flex.w-full.max-w-3xl.flex-col.gap-3
   .flex.items-center.gap-2
     h1.shrink-0.text-lg.font-bold Create a new collectible 🧸✨
     .h-px.w-full.bg-base-100
