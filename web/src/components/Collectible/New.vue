@@ -229,6 +229,16 @@ async function create() {
     return;
   }
 
+  // Prompt when zero content is marked private.
+  if (
+    content.value.filter((content) => content.gated).length === 0 &&
+    !confirm(
+      "Are you sure you want to make all content public? You will not be able to change this later."
+    )
+  ) {
+    return;
+  }
+
   createDialog.value = true;
 
   try {
