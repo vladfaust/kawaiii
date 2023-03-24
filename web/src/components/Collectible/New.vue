@@ -285,7 +285,10 @@ async function create() {
       description: description.value || null,
       editions: editions.value,
       mintPrice: ethers.utils.parseEther(priceEth.value.toString())._hex,
-      royalty: royalty.value,
+
+      // FIXME: For some reason, it is sent as string after modifying.
+      royalty: parseInt(royalty.value as unknown as string),
+
       preview: {
         size: previewImageFile.value.size,
       },
