@@ -2,10 +2,11 @@
 import User from "@/model/User";
 import { trpc } from "@/services/api";
 import { useFileDialog, computedAsync, refDebounced } from "@vueuse/core";
-import { computed, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/vue";
 import { uploadFile } from "@/modules/axios";
 import Spinner from "../util/Spinner.vue";
+import { onBeforeRouteLeave } from "vue-router";
 
 const HANDLE_MIN = 8;
 const HANDLE_MAX = 32;
@@ -15,7 +16,7 @@ const BIO_MAX = 1024;
 const BGP_MAX_SIZE = 1024 * 1024 * 2; // 2 MiB
 const PFP_MAX_SIZE = 1024 * 1024 * 1; // 1 MiB
 
-const { user, open } = defineProps<{
+const props = defineProps<{
   user: User;
   open: boolean;
 }>();
@@ -25,16 +26,18 @@ const emit = defineEmits<{
   (event: "update"): void;
 }>();
 
-const name = ref<string>(user.name);
+const justEdited = ref(false);
+
+const name = ref<string>(props.user.name);
 const nameValid = computed(() => name.value.length <= NAME_MAX);
 
-const handle = ref<string>(user.handle);
+const handle = ref<string>(props.user.handle);
 const handleDebounced = refDebounced(handle, 500);
 const handleValid = computed(
   () =>
     !handle.value || (handle.value.match(HANDLE_REGEX) && handleAvailable.value)
 );
-const handleChanged = computed(() => handle.value !== user.handle);
+const handleChanged = computed(() => handle.value !== props.user.handle);
 const handleAvailableCheckInProgress = ref(false);
 const handleAvailable = computedAsync(
   async () => {
@@ -47,7 +50,7 @@ const handleAvailable = computedAsync(
     });
 
     if (result === null) return true;
-    if (result.id === user.id) return true;
+    if (result.id === props.user.id) return true;
 
     return false;
   },
@@ -58,7 +61,7 @@ const handleAvailable = computedAsync(
   }
 );
 
-const bio = ref<string>(user.bio);
+const bio = ref<string>(props.user.bio);
 const bioValid = computed(() => bio.value.length <= BIO_MAX);
 
 const bgpError = ref(false);
@@ -94,9 +97,9 @@ const valid = computed(
 
 const anyChanges = computed(
   () =>
-    name.value !== user.name ||
-    handle.value !== user.handle ||
-    bio.value !== user.bio ||
+    name.value !== props.user.name ||
+    handle.value !== props.user.handle ||
+    bio.value !== props.user.bio ||
     bgpFile.value ||
     pfpFile.value
 );
@@ -123,15 +126,15 @@ async function save() {
   const promises = [];
 
   if (
-    name.value !== user.name ||
-    handle.value !== user.handle ||
-    bio.value !== user.bio
+    name.value !== props.user.name ||
+    handle.value !== props.user.handle ||
+    bio.value !== props.user.bio
   ) {
     promises.push(
       trpc.commands.users.update.mutate({
-        handle: handle.value !== user.handle ? handle.value : undefined,
-        name: name.value !== user.name ? name.value : undefined,
-        bio: bio.value !== user.bio ? bio.value : undefined,
+        handle: handle.value !== props.user.handle ? handle.value : undefined,
+        name: name.value !== props.user.name ? name.value : undefined,
+        bio: bio.value !== props.user.bio ? bio.value : undefined,
       })
     );
   }
@@ -159,6 +162,7 @@ async function save() {
   try {
     inProgress.value = true;
     await Promise.all(promises);
+    justEdited.value = true;
     emit("update");
   } catch (e) {
     alert("Failed to save changes. Please try again later.");
@@ -168,10 +172,50 @@ async function save() {
     uploadedTotal.value = 0;
   }
 }
+
+function mayLeave(): boolean {
+  let answer = true;
+
+  if (props.open && anyChanges.value && !justEdited.value) {
+    answer = window.confirm(
+      "Do you really want to close? All uncomitted data will be lost."
+    );
+  }
+
+  return answer;
+}
+
+onBeforeRouteLeave((to, from, next) => {
+  next(mayLeave());
+});
+
+function beforeunload(e: BeforeUnloadEvent) {
+  if (!mayLeave()) {
+    e.preventDefault();
+
+    // Chrome requires returnValue to be set
+    e.returnValue = "";
+  }
+}
+
+onMounted(() => {
+  window.addEventListener("beforeunload", beforeunload);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("beforeunload", beforeunload);
+});
+
+function onClose(event: boolean) {
+  if (mayLeave()) {
+    // TODO: Reset changes, if any.
+    emit("close");
+  }
+}
 </script>
 
 <template lang="pug">
-Dialog.relative.z-40(:open="open" @close="emit('close')")
+Dialog.relative.z-40(:open="open" @close="onClose")
   .fixed.inset-0(class="bg-black/30" aria-hidden="true")
   .fixed.inset-0.overflow-y-auto.p-4
     .flex.min-h-full.items-center.justify-center
@@ -180,7 +224,7 @@ Dialog.relative.z-40(:open="open" @close="emit('close')")
           span.shrink-0.text-lg.font-bold Edit profile
           .h-px.w-full.bg-base-100
           button.pressable.shrink-0.text-base-300.transition-transform(
-            @click="emit('close')"
+            @click="onClose"
           )
             | ❌
         .flex.flex-col.gap-2

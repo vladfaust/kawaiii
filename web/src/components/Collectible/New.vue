@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useFileDialog, useDropZone } from "@vueuse/core";
-import { computed, watch, ref, type Ref } from "vue";
+import { computed, watch, ref, type Ref, onMounted, onUnmounted } from "vue";
 import { Sortable } from "sortablejs-vue3";
 import { nanoid } from "nanoid";
 import config from "@/config";
@@ -14,6 +14,7 @@ import { Dialog, DialogPanel } from "@headlessui/vue";
 import Spinner from "../util/Spinner.vue";
 import axios, { type AxiosProgressEvent } from "axios";
 import { toHex } from "@/util";
+import { onBeforeRouteLeave } from "vue-router";
 
 type Content = {
   file: File;
@@ -28,6 +29,7 @@ const DESCRIPTION_MAX_LENGTH = 1024;
 const MAX_EDITIONS = 1000;
 const MAX_CONTENT_FILES = 32;
 const MAX_TOTAL_CONTENT_FILE_SIZE = 128 * 1024 * 1024; // 100MB
+const INIT_ROYALTY = 25;
 
 const previewImageDialog = useFileDialog({
   accept: "image/*",
@@ -116,7 +118,19 @@ const name = ref("");
 const description: Ref<string | undefined> = ref();
 const editions: Ref<number | undefined> = ref();
 const priceEth: Ref<number | undefined> = ref();
-const royalty = ref(25);
+const royalty = ref(INIT_ROYALTY);
+
+const anyChanges = computed(
+  () =>
+    !!previewImageFile.value ||
+    !!name.value ||
+    !!description.value ||
+    !!editions.value ||
+    !!priceEth.value ||
+    royalty.value != INIT_ROYALTY ||
+    content.value.length > 0
+);
+
 const createDialog = ref(false);
 enum CreateStage {
   WaitingForSignature,
@@ -349,6 +363,39 @@ async function uploadFile(
     throw new Error("Failed to upload file");
   }
 }
+
+function mayLeave(): boolean {
+  let answer = true;
+
+  if (anyChanges.value && createStage.value !== CreateStage.Done) {
+    answer = window.confirm(
+      "Do you really want to leave? All uncomitted data will be lost."
+    );
+  }
+
+  return answer;
+}
+
+onBeforeRouteLeave((to, from, next) => {
+  next(mayLeave());
+});
+
+function beforeunload(e: BeforeUnloadEvent) {
+  if (!mayLeave()) {
+    e.preventDefault();
+
+    // Chrome requires returnValue to be set
+    e.returnValue = "";
+  }
+}
+
+onMounted(() => {
+  window.addEventListener("beforeunload", beforeunload);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("beforeunload", beforeunload);
+});
 </script>
 
 <template lang="pug">
