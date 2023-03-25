@@ -35,7 +35,7 @@ function pickRandomImages(length: number) {
       :key="image"
     )
   .flex.max-w-md.flex-col.justify-center.gap-6.rounded-xl.bg-white.p-6.shadow-xl
-    img.w-16(src="/paw.svg" alt="👋" title="Hello, senpai~")
+    img.hidden.w-16.sm_block(src="/paw.svg" alt="👋" title="Hello, senpai~")
     h1.text-5xl.font-black Connect with your fans like never before.
     h2.text-lg.font-bold.leading-snug
       | Kawaiii.co™️ is a revolutionary crypto service for

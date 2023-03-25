@@ -69,13 +69,20 @@ Dialog.relative(
         p.leading-tight.text-base-600
           | kawaiii.co does not rely on obsolete authentication providers, and it respects your privacy.
           | Currently, you may only log into kawaiii.co using an Ethereum wallet, such as&nbsp;
-          a.link.inline-flex.align-bottom(href="https://metamask.io/" class="gap-0.5")
-            img.inline-block.h-5(src="/metamask.svg" alt="MetaMask logo")
-            | MetaMask
+          a.link(href="https://metamask.io/") MetaMask
           | .
         ol.font-bold
           li.text-lg.leading-tight
-            | 1️⃣ Make sure you have an Ethereum wallet installed.
+            | 1️⃣ Make sure you have
+            |
+            a.link.inline-flex.align-bottom(
+              href="https://metamask.io/"
+              class="gap-0.5"
+            )
+              img.inline-block.h-5(src="/metamask.svg" alt="MetaMask logo")
+              | MetaMask
+            |
+            | installed.
           li.text-lg.leading-tight
             | 2️⃣ Click the button to log in. ⤵️
         button.btn.btn-primary.btn-lg.btn-web3(
@@ -91,6 +98,8 @@ Dialog.relative(
           span Wait for signature...
         .btn.btn-lg.flex.gap-2(v-else-if="state === State.Done")
           span Logged in!
+
+        //- TODO: Redirect to some Metamask tutorial.
         p.text-center.text-sm.text-base-500
           | Need help? Check out our&nbsp;
           RouterLink.link(to="/help" @click="close") help page
