@@ -37,6 +37,8 @@
     "@graphql-yoga/urql-exchange": "^1.6.3",
     "@kawaiii/contracts": "file:../contracts",
     "@prisma/client": "^4.10.1",
+    "@sentry/node": "^7.45.0",
+    "@sentry/tracing": "^7.45.0",
     "@trpc/server": "^10.11.1",
     "@urql/core": "^3.2.2",
     "chalk": "^5.2.0",

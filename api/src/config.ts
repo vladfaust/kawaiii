@@ -31,6 +31,14 @@ class S3 {
   ) {}
 }
 
+class Sentry {
+  constructor(
+    readonly dsn: string,
+    readonly debug?: boolean,
+    readonly environment?: string
+  ) {}
+}
+
 class Config {
   constructor(
     readonly prod: boolean,
@@ -38,7 +46,8 @@ class Config {
     readonly redisUrl: URL,
     readonly server: Server,
     readonly eth: Eth,
-    readonly s3: S3
+    readonly s3: S3,
+    readonly sentry?: Sentry
   ) {}
 }
 
@@ -71,7 +80,16 @@ const config = new Config(
     new URL(requireEnv("S3_ENDPOINT")),
     requireEnv("S3_REGION"),
     requireEnv("S3_BUCKET")
-  )
+  ),
+  process.env.SENTRY_DSN
+    ? new Sentry(
+        requireEnv("SENTRY_DSN"),
+        process.env.SENTRY_DEBUG !== undefined
+          ? process.env.SENTRY_DEBUG === "true"
+          : undefined,
+        process.env.SENTRY_ENVIRONMENT
+      )
+    : undefined
 );
 
 export default config;
