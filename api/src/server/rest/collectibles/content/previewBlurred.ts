@@ -6,6 +6,7 @@ import * as s3 from "@/services/s3";
 import sharp from "sharp";
 import { Hex32 } from "@/schema";
 import { LOWRES } from "./preview";
+import { toHex } from "@/utils";
 
 const prisma = new PrismaClient();
 
@@ -26,7 +27,7 @@ export default async function (req: Request, res: Response) {
   const content = await prisma.collectibleContent.findUnique({
     where: {
       collectibleId_name: {
-        collectibleId,
+        collectibleId: toHex(collectibleId),
         name: contentName,
       },
     },
@@ -82,7 +83,7 @@ export default async function (req: Request, res: Response) {
       img = sharp(previewBuf);
     }
 
-    img.blur(10);
+    img.blur(15);
     await s3.upload(contentPreviewBlurredKey, await img.toBuffer());
   }
 

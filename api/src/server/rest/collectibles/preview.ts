@@ -4,6 +4,7 @@ import * as s3Express from "@/services/s3+express";
 import { PrismaClient } from "@prisma/client";
 import { Hex32 } from "@/schema";
 import { z } from "zod";
+import { toHex } from "@/utils";
 
 const prisma = new PrismaClient();
 
@@ -15,7 +16,7 @@ export default async function (req: Request, res: Response) {
   const { collectibleId } = SCHEMA.parse(req.params);
 
   const collectible = await prisma.collectible.findUnique({
-    where: { id: collectibleId },
+    where: { id: toHex(collectibleId) },
   });
 
   if (!collectible) {

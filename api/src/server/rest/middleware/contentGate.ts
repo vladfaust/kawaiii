@@ -1,6 +1,7 @@
 import { Hex32 } from "@/schema";
 import { balanceOfCollectible } from "@/services/eth";
 import { contentKey, keyExists } from "@/services/s3";
+import { toHex } from "@/utils";
 import { PrismaClient } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 import { z } from "zod";
@@ -34,7 +35,7 @@ export default async function (
   const content = await prisma.collectibleContent.findUnique({
     where: {
       collectibleId_name: {
-        collectibleId,
+        collectibleId: toHex(collectibleId),
         name: contentName,
       },
     },

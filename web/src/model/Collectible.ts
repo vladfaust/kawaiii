@@ -40,7 +40,7 @@ export default class Collectible {
   }
 
   static fromBackend(data: {
-    id: Buffer;
+    id: string;
     Creator: { id: string };
     name: string;
     description: string | null;
@@ -57,7 +57,7 @@ export default class Collectible {
   }) {
     const collectible = markRaw(
       new Collectible(
-        bufferToUint8Array(data.id),
+        toUint8Array(data.id),
         Deferred.from(User.get(data.Creator.id)),
         data.name,
         data.description,

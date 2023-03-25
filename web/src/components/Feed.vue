@@ -3,8 +3,7 @@ import Collectible from "@/model/Collectible";
 import Content from "@/model/Collectible/Content";
 import User from "@/model/User";
 import { trpc } from "@/services/api";
-import { toHex } from "@/util";
-import { bufferToUint8Array } from "@/util/prisma";
+import { toHex, toUint8Array } from "@/util";
 import { onMounted, shallowRef } from "vue";
 import Post from "./Collectible/Post.vue";
 import GalleryModal from "./GalleryModal.vue";
@@ -15,7 +14,7 @@ const subscriptions = shallowRef<User[]>([]);
 onMounted(() => {
   trpc.commands.users.feed
     .query()
-    .then((ids) => ids.map((id) => Collectible.get(bufferToUint8Array(id))))
+    .then((ids) => ids.map((id) => Collectible.get(toUint8Array(id))))
     .then(async (collectibles) => {
       feed.value = await Promise.all(collectibles);
     });

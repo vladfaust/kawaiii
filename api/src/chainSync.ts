@@ -27,7 +27,7 @@ type CollectibleCreateEventData = BaseEvent & {
   creatorId: string;
 
   /** Database collectible ID. */
-  collectibleId: Buffer;
+  collectibleId: string;
 };
 
 type CollectibleMintEventData = BaseEvent & {
@@ -35,7 +35,7 @@ type CollectibleMintEventData = BaseEvent & {
   toId: string;
 
   /** Database collectible ID. */
-  collectibleId: Buffer;
+  collectibleId: string;
 
   amount: bigint;
   income: bigint;
@@ -51,7 +51,7 @@ type CollectibleTransferEventData = BaseEvent & {
   toId?: string;
 
   /** Database collectible ID. */
-  collectibleId: Buffer;
+  collectibleId: string;
 
   subIndex: number;
   value: bigint;
@@ -186,7 +186,7 @@ async function syncCreateEvents() {
     return [
       {
         creatorId: await ensureUser(parsed.args.creator),
-        collectibleId: toBuffer(parsed.args.tokenId),
+        collectibleId: toHex(parsed.args.tokenId),
         blockNumber: log.blockNumber,
         logIndex: log.logIndex,
         txHash: log.transactionHash,
@@ -233,7 +233,7 @@ async function syncMintEvents() {
     return [
       {
         toId: await ensureUser(parsed.args.to),
-        collectibleId: toBuffer(parsed.args.tokenId),
+        collectibleId: toHex(parsed.args.tokenId),
         blockNumber: log.blockNumber,
         logIndex: log.logIndex,
         txHash: log.transactionHash,
@@ -320,7 +320,7 @@ async function insertTransferEvent(event: CollectibleTransferEventData) {
           where: {
             userId_collectibleId: {
               userId: event.fromId,
-              collectibleId: event.collectibleId,
+              collectibleId: toHex(event.collectibleId),
             },
           },
           update: {
@@ -330,7 +330,7 @@ async function insertTransferEvent(event: CollectibleTransferEventData) {
           },
           create: {
             userId: event.fromId,
-            collectibleId: event.collectibleId,
+            collectibleId: toHex(event.collectibleId),
             balance: -event.value,
           },
         });
@@ -353,7 +353,7 @@ async function syncTransferSingleEvents() {
           parsed.args.to != ethers.constants.AddressZero
             ? await ensureUser(parsed.args.to)
             : undefined,
-        collectibleId: toBuffer(parsed.args.id),
+        collectibleId: toHex(parsed.args.id),
         blockNumber: log.blockNumber,
         logIndex: log.logIndex,
         subIndex: 0,
@@ -408,7 +408,7 @@ async function syncTransferBatchEvents() {
           parsed.args.to != ethers.constants.AddressZero
             ? await ensureUser(parsed.args.to)
             : undefined,
-        collectibleId: toBuffer(id),
+        collectibleId: toHex(id),
         blockNumber: log.blockNumber,
         logIndex: log.logIndex,
         subIndex: index,

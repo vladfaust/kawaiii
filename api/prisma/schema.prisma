@@ -54,7 +54,7 @@ model Follow {
 }
 
 model Collectible {
-  id Bytes @id // Token ID
+  id String @id // Hex bytes string
 
   creatorId String
 
@@ -86,7 +86,7 @@ enum CollectibleContentType {
 model CollectibleContent {
   id Int @id @default(autoincrement())
 
-  collectibleId Bytes
+  collectibleId String
 
   type  CollectibleContentType
   name  String // File name
@@ -100,7 +100,7 @@ model CollectibleContent {
 
 model CollectibleBalance {
   userId        String
-  collectibleId Bytes
+  collectibleId String
 
   balance BigInt
 
@@ -114,7 +114,7 @@ model CollectibleBalance {
 
 model Like {
   userId        String
-  collectibleId Bytes
+  collectibleId String
 
   createdAt DateTime @default(now())
 
@@ -126,7 +126,7 @@ model Like {
 
 model CollectibleCreateEvent {
   creatorId     String
-  collectibleId Bytes  @unique
+  collectibleId String @unique
 
   blockNumber Int
   logIndex    Int
@@ -142,7 +142,7 @@ model CollectibleCreateEvent {
 
 model CollectibleMintEvent {
   toId          String
-  collectibleId Bytes
+  collectibleId String
 
   blockNumber Int
   logIndex    Int
@@ -164,7 +164,7 @@ model CollectibleMintEvent {
 model CollectibleTransferEvent {
   fromId        String? // Null if minted
   toId          String? // Null if burned
-  collectibleId Bytes
+  collectibleId String
 
   blockNumber Int
   logIndex    Int

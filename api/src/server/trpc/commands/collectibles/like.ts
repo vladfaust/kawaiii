@@ -1,5 +1,6 @@
 import { protectedProcedure } from "#trpc/middleware/auth";
 import { Hex32 } from "@/schema";
+import { toHex } from "@/utils";
 import { PrismaClient } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
@@ -14,7 +15,7 @@ export default protectedProcedure
         where: {
           userId_collectibleId: {
             userId: ctx.user.id,
-            collectibleId: input.collectibleId,
+            collectibleId: toHex(input.collectibleId),
           },
         },
       });
@@ -29,7 +30,7 @@ export default protectedProcedure
       await prisma.like.create({
         data: {
           userId: ctx.user.id,
-          collectibleId: input.collectibleId,
+          collectibleId: toHex(input.collectibleId),
         },
       });
     });

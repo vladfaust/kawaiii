@@ -76,7 +76,7 @@ export default protectedProcedure
 
     const collectible = await prisma.collectible.create({
       data: {
-        id: input.id,
+        id: toHex(input.id),
         creatorId: ctx.user.id,
         name: input.name,
         description: input.description,
@@ -97,14 +97,14 @@ export default protectedProcedure
     });
 
     const previewUploadUrl = await getUploadUrl(
-      collectiblePreviewKey(collectible.id),
+      collectiblePreviewKey(input.id),
       60 * 5 // 5 minutes
     );
 
     const contentUploadUrls = await Promise.all(
       input.content.map(async (content) => {
         return await getUploadUrl(
-          contentKey(collectible.id, content.name),
+          contentKey(input.id, content.name),
           60 * 5 // 5 minutes
         );
       })

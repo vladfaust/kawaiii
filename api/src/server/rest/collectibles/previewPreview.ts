@@ -19,7 +19,7 @@ export default async function (req: Request, res: Response) {
   const { collectibleId } = SCHEMA.parse(req.params);
 
   const collectible = await prisma.collectible.findUnique({
-    where: { id: collectibleId },
+    where: { id: toHex(collectibleId) },
   });
 
   if (!collectible) {
