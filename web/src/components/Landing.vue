@@ -34,13 +34,12 @@ function pickRandomImages(length: number) {
       :src="image"
       :key="image"
     )
-  .flex.max-w-lg.flex-col.justify-center.gap-6.rounded-xl.bg-white.p-6.shadow-xl
+  .flex.max-w-md.flex-col.justify-center.gap-6.rounded-xl.bg-white.p-6.shadow-xl
     h1.text-5xl.font-black Connect to your fans like never before.
-    h2.text-xl.font-bold Kawaiii.co™️ is a revolutionary Web3 service for kawaii creators and their fans.
+    h2.text-lg.font-bold.leading-snug Kawaiii.co™️ is a revolutionary Web3 service for kawaii creators and their fans.
     ul.flex.flex-col.gap-1
-      li.leading-tight ✅ Collect exclusive content on-chain, and get paid for it.
-      li.leading-tight ✅ Proceeds go instantly and directly to your Polygon wallet.
-      li.leading-tight ✅ The content is decentralized; you can't be censored.
+      li.leading-tight ✅ Collect exclusive content on-chain.
+      li.leading-tight ✅ Proceeds go instantly to your Polygon wallet.
       li.leading-tight ✅ Royalties enabled for the secondary market.
     button.btn.btn-lg.btn-hoverable.btn-nft.group(@click="loginModal = true") Get started
 </template>
