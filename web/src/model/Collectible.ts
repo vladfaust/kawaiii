@@ -130,7 +130,14 @@ export default class Collectible {
   }
 
   async fetchTotalSupply() {
-    this.totalSupply.value = await totalSupplyOfCollectible(this.id);
+    const [real, fake] = await Promise.all([
+      totalSupplyOfCollectible(this.id),
+      trpc.commands.collectibles.getFakeEditionsCount.query({
+        collectibleId: toHex(this.id),
+      }),
+    ]);
+
+    this.totalSupply.value = real.add(fake);
   }
 
   private constructor(
