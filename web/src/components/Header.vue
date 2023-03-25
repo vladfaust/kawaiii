@@ -37,7 +37,7 @@ header.flex.h-16.w-full.place-content-center.border-b.px-4
             :to="{ name: 'NewCollectible' }"
           )
             span.hidden.sm_inline Create
-            span ✨
+            span.sm_hidden ✨
         li.h-full(v-if="user")
           RouterLink._link.gap-2(:to="{ name: 'Me' }")
             PFP.h-8.rounded-full(:user="user" :key="user.id")

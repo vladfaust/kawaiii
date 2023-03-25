@@ -13,7 +13,7 @@ import { loginModal, logout, userId } from "@/modules/auth";
 import EditModal from "./Profile/EditModal.vue";
 import PFP from "@/components/PFP.vue";
 import FolloweesModal from "./Profile/FolloweesModal.vue";
-import { toUint8Array } from "@/util";
+import { toHex, toUint8Array } from "@/util";
 import Placeholder from "./util/Placeholder.vue";
 import { useImage } from "@vueuse/core";
 import { CheckBadgeIcon } from "@heroicons/vue/20/solid";
@@ -207,7 +207,10 @@ const tab = ref(Tab.Created);
                 )
                 span.leading-none.text-base-400(v-if="user.value.id == userId") &nbsp;(you)
 
-              span.text.leading-none.text-base-500(v-if="user.value.handle") @{{ user.value.handle }}
+              RouterLink.text.link-hover.w-min.leading-none.text-base-500(
+                v-if="user.value.handle"
+                :to="{ name: 'Profile', params: { handle: user.value.handle } }"
+              ) @{{ user.value.handle }}
               span.text.italic.leading-none.text-base-400(v-else) @undefined
 
             .mt-1.flex.gap-2
@@ -295,6 +298,7 @@ const tab = ref(Tab.Created);
             :collectible="collectible"
             :show-gallery="true"
             @choose-content="(e) => { setGallery(created, collectible, e); }"
+            :key="toHex(collectible.id)"
           )
           p.p-8.text-center.text-lg.leading-snug.text-base-500(v-else)
             span(v-if="isSelf") You
@@ -311,6 +315,7 @@ const tab = ref(Tab.Created);
             :collectible="collectible"
             :show-gallery="true"
             @choose-content="(e) => { setGallery(liked, collectible, e); }"
+            :key="toHex(collectible.id)"
           )
           p.p-8.text-center.text-lg.leading-snug.text-base-500(v-else)
             span(v-if="isSelf") You
@@ -327,6 +332,7 @@ const tab = ref(Tab.Created);
             :collectible="collectible"
             :show-gallery="true"
             @choose-content="(e) => { setGallery(collected, collectible, e); }"
+            :key="toHex(collectible.id)"
           )
           p.p-8.text-center.text-lg.leading-snug.text-base-500(v-else)
             span You haven't collected anything yet. 💁‍♂️
