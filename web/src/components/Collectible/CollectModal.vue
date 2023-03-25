@@ -119,7 +119,7 @@ Dialog.relative.z-40(
           li(v-if="exclusiveContentLength")
             p.leading-tight
               | 👉 A holder of this collectible gains exclusive access to&nbsp;
-              strong {{ exclusiveContentLength }} private photos
+              strong {{ exclusiveContentLength }} private pictures
               | .
 
         Callout(:type="'info'" v-if="collectible.collected.value")

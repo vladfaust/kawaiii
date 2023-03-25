@@ -35,8 +35,14 @@ function pickRandomImages(length: number) {
       :key="image"
     )
   .flex.max-w-md.flex-col.justify-center.gap-6.rounded-xl.bg-white.p-6.shadow-xl
-    h1.text-5xl.font-black Connect to your fans like never before.
-    h2.text-lg.font-bold.leading-snug Kawaiii.co™️ is a revolutionary Web3 service for kawaii creators and their fans.
+    img.w-16(src="/paw.svg" alt="👋" title="Hello, senpai~")
+    h1.text-5xl.font-black Connect with your fans like never before.
+    h2.text-lg.font-bold.leading-snug
+      | Kawaiii.co™️ is a revolutionary crypto service for
+      |
+      a.link(href="https://en.wikipedia.org/wiki/Kawaii") kawaii
+      |
+      | creators and their fans.
     ul.flex.flex-col.gap-1
       li.leading-tight ✅ Collect exclusive content on-chain.
       li.leading-tight ✅ Proceeds go instantly to your Polygon wallet.
