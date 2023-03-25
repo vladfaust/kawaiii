@@ -31,7 +31,7 @@ async function deploy(contractName, deployOptions = {}, args = []) {
 
 async function main() {
   await deploy("KawaiiiCollectible", {}, [
-    "https://localost:4100/rest/collectible/{id}/metadata.json",
+    "https://api.kawaiii.co/rest/collectible/0x{id}/metadata.json",
     "Kawaiii Collectible",
     "1",
     25,
