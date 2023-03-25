@@ -10,7 +10,7 @@ import { toBuffer, toHex } from "./utils";
 import { BigNumber, ethers } from "ethers";
 import { PrismaClient } from "@prisma/client";
 import { nanoid } from "nanoid";
-import { provider } from "./services/eth";
+import { httpProvider, wsProvider } from "./services/eth";
 import redis from "@/services/redis";
 
 type Log = ethers.providers.Log;
@@ -63,7 +63,7 @@ async function blockTimestamp(blockNumber: number): Promise<Date> {
   if (cachedTimestamp) {
     return new Date(parseInt(cachedTimestamp) * 1000);
   } else {
-    const block = await provider.getBlock(blockNumber);
+    const block = await httpProvider.getBlock(blockNumber);
     const timestamp = block.timestamp;
     await redis.set(`block:${blockNumber}:timestamp`, timestamp);
     return new Date(timestamp * 1000);
@@ -97,7 +97,7 @@ async function ensureUser(address: string): Promise<string> {
 const iface = KawaiiiCollectible__factory.createInterface();
 const prisma = new PrismaClient();
 
-const latestChainBlockNumber = await provider.getBlockNumber();
+const latestChainBlockNumber = await httpProvider.getBlockNumber();
 
 async function syncHistoricalEvents<T extends BaseEvent>(
   topic: string,
@@ -112,7 +112,7 @@ async function syncHistoricalEvents<T extends BaseEvent>(
   while (fromBlock < latestChainBlockNumber) {
     console.log(`Querying historical logs from block ${fromBlock}`);
 
-    const logs = await provider.getLogs({
+    const logs = await httpProvider.getLogs({
       fromBlock,
       toBlock: latestChainBlockNumber,
       address: toHex(config.eth.collectibleContractAddress),
@@ -159,7 +159,7 @@ async function subscribeToRealtimeEvents<T>(
   logMapFn: (log: Log) => Promise<T[]>,
   createManyFn: (events: T[]) => Promise<void>
 ) {
-  provider.on(
+  wsProvider.on(
     { address: toHex(config.eth.collectibleContractAddress), topics: [topic] },
     async (log) => {
       const events = await logMapFn(log);
@@ -172,7 +172,7 @@ async function subscribeToRealtimeEvents<T>(
   );
 
   return () => {
-    provider.off({
+    wsProvider.off({
       address: toHex(config.eth.collectibleContractAddress),
       topics: [topic],
     });

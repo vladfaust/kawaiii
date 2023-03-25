@@ -15,6 +15,7 @@ class Eth {
   constructor(
     readonly chainId: number,
     readonly httpRpcUrl: URL,
+    readonly wsRpcUrl: URL | undefined,
     readonly privateKey: Buffer,
     readonly collectibleContractAddress: Buffer
   ) {}
@@ -58,6 +59,9 @@ const config = new Config(
   new Eth(
     parseInt(requireEnv("ETH_CHAIN_ID")),
     new URL(requireEnv("ETH_HTTP_RPC_URL")),
+    process.env.ETH_WS_RPC_URL
+      ? new URL(requireEnv("ETH_WS_RPC_URL"))
+      : undefined,
     toBuffer(requireEnv("ETH_PRIVATE_KEY")),
     toBuffer(requireEnv("ETH_COLLECTIBLE_CONTRACT_ADDRESS"))
   ),
