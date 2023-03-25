@@ -61,6 +61,7 @@ export async function ensureWeb3Token() {
     web3Token.value = await Web3Token.sign(
       async (msg: string) => provider.value!.getSigner().signMessage(msg),
       {
+        statement: "I am signing this request to authenticate myself.",
         domain: import.meta.env.PROD
           ? config.trpcCommandsUrl.hostname
           : undefined,
