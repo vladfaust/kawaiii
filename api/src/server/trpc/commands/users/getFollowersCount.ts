@@ -11,7 +11,17 @@ export default t.procedure
   .input(z.object({ followeeId: z.string() }))
   .output(z.number().int())
   .query(async ({ input }) => {
-    return prisma.follow.count({
-      where: { followeeId: input.followeeId },
-    });
+    const [real, fake] = await Promise.all([
+      prisma.follow.count({
+        where: { followeeId: input.followeeId },
+      }),
+      prisma.user
+        .findUnique({
+          where: { id: input.followeeId },
+          select: { fakeFollowers: true },
+        })
+        .then((u) => u?.fakeFollowers || 0),
+    ]);
+
+    return real + fake;
   });

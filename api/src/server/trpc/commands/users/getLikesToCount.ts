@@ -17,14 +17,24 @@ export default t.procedure
   .query(async ({ input }) => {
     const collectibles = await prisma.collectible.findMany({
       where: { creatorId: input.userId },
-      select: { id: true },
+      select: {
+        id: true,
+        fakeLikes: true,
+      },
     });
 
-    return await prisma.like.count({
+    const real = await prisma.like.count({
       where: {
         collectibleId: {
           in: collectibles.map((collectible) => collectible.id),
         },
       },
     });
+
+    const fake = collectibles.reduce(
+      (acc, collectible) => acc + collectible.fakeLikes,
+      0
+    );
+
+    return real + fake;
   });

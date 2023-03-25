@@ -7,8 +7,19 @@ const prisma = new PrismaClient();
 
 export default t.procedure
   .input(z.object({ collectibleId: Hex32 }))
+  .output(z.number().int())
   .query(async ({ input }) => {
-    return await prisma.like.count({
-      where: { collectibleId: input.collectibleId },
-    });
+    const [real, fake] = await Promise.all([
+      prisma.like.count({
+        where: { collectibleId: input.collectibleId },
+      }),
+      prisma.collectible
+        .findUnique({
+          where: { id: input.collectibleId },
+          select: { fakeLikes: true },
+        })
+        .then((c) => c?.fakeLikes || 0),
+    ]);
+
+    return real + fake;
   });

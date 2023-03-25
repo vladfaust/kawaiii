@@ -24,6 +24,8 @@ model User {
   bgpVersion Int @default(0)
   pfpVersion Int @default(0)
 
+  fakeFollowers Int @default(0)
+
   createdAt DateTime @default(now())
 
   Followers Follow[] @relation("Followers")
@@ -61,6 +63,8 @@ model Collectible {
   mintPrice   Bytes // In wei // TODO: Change to BigInt
   editions    Int
   royalty     Int // 0-255
+
+  fakeLikes Int @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
