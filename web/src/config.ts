@@ -22,11 +22,20 @@ class Eth {
   ) {}
 }
 
+class Sentry {
+  constructor(
+    readonly dsn: string,
+    readonly debug?: boolean,
+    readonly environment?: string
+  ) {}
+}
+
 class Config {
   constructor(
     readonly restUrl: URL,
     readonly trpcCommandsUrl: URL,
-    readonly eth: Eth
+    readonly eth: Eth,
+    readonly sentry?: Sentry
   ) {}
 }
 
@@ -41,7 +50,16 @@ const config = new Config(
   new Eth(
     JSON.parse(requireEnv("VITE_ETH_CHAIN")),
     toUint8Array(requireEnv("VITE_ETH_COLLECTIBLE_ADDRESS"))
-  )
+  ),
+  import.meta.env.VITE_SENTRY_DSN
+    ? new Sentry(
+        requireEnv("VITE_SENTRY_DSN"),
+        import.meta.env.VITE_SENTRY_DEBUG !== undefined
+          ? import.meta.env.VITE_SENTRY_DEBUG
+          : undefined,
+        import.meta.env.VITE_SENTRY_ENVIRONMENT
+      )
+    : undefined
 );
 
 export default config;

@@ -20,6 +20,8 @@
     "@kawaiii/api": "file:../api",
     "@kawaiii/contracts": "file:../contracts",
     "@kyvg/vue3-notification": "^2.9.0",
+    "@sentry/tracing": "^7.45.0",
+    "@sentry/vue": "^7.45.0",
     "@trpc/client": "^10.11.1",
     "@trpc/server": "^10.16.0",
     "@vueuse/core": "^9.13.0",
