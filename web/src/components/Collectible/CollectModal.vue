@@ -134,7 +134,7 @@ Dialog.relative.z-40(
             | You may try obtaining it on the secondary market.
 
         template(v-else-if="userId")
-          button.btn.btn-web3(
+          button.btn-lg.btn.btn-web3(
             v-if="stage === undefined"
             ref="buttonRef"
             @click="collect"
@@ -142,7 +142,7 @@ Dialog.relative.z-40(
             | 🍃 Mint {{ collectible.collected.value ? "more " : "" }}for
             | {{ ethers.utils.formatEther(collectible.mintPrice) }}
             | {{ config.eth.chain.nativeCurrency.symbol }}
-          .btn.btn-ghost(v-else)
+          .btn.btn-lg.btn-ghost(v-else)
             .flex.items-center.gap-2(v-if="stage === Stage.SendingTx")
               Spinner.h-4.animate-spin
               span Sending tx...
@@ -152,7 +152,7 @@ Dialog.relative.z-40(
               Spinner.h-4.animate-spin
               span Waiting confirm...
 
-        button.btn.btn-primary(
+        button.btn-lg.btn.btn-primary(
           v-else
           ref="buttonRef"
           @click="loginModal = true"

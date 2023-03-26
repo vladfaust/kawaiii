@@ -257,9 +257,8 @@ Dialog.relative.z-40(:open="open" @close="close")
                 )
                   ChevronLeftIcon.h-12.text-white.drop-shadow.transition.group-hover_opacity-100.group-active_scale-95.md_text-inherit.md_opacity-50.md_drop-shadow-none
 
-                .absolute.z-10.m-12.flex.flex-col.gap-2.rounded-lg.p-6.shadow-lg.backdrop-blur.backdrop-brightness-125(
+                .absolute.z-10.m-12.flex.flex-col.gap-2.rounded-lg.p-6.shadow-lg.backdrop-blur.backdrop-brightness-125.bg-white(
                   v-if="content && content.gated && !content.unlocked.value"
-                  class="bg-white/75"
                 )
                   p.max-w-xs.text-center.leading-tight
                     span.text-lg.font-extrabold 🔒 The content is locked.
