@@ -11,8 +11,6 @@ export const LOWRES = 512;
  * Content ownership is required to access preview.
  */
 export default async function (req: Request, res: Response) {
-  console.log("content/preview");
-
   const content = res.locals.content as Content;
 
   const contentKey = s3.contentKey(content.collectibleId, content.name);
@@ -35,8 +33,6 @@ export default async function (req: Request, res: Response) {
     const img = sharp(buf).resize(LOWRES);
     await s3.upload(contentPreviewKey, await img.toBuffer());
   }
-
-  console.log("contentPreviewKey", contentPreviewKey);
 
   await s3Express.pipeTo(contentPreviewKey, res, {
     cacheMaxAge: 60 * 60 * 24 * 365, // 1 year

@@ -7,11 +7,9 @@ export async function processIfNotExists(
   processFn: (sharp: sharp.Sharp) => Promise<sharp.Sharp>
 ) {
   if (await s3.keyExists(targetKey)) {
-    console.log(`Skipping ${targetKey} because it already exists`);
     return;
   }
 
-  console.log(`Processing ${targetKey} from ${sourceKey}...`);
   let buf = new Uint8Array();
   const stream = new WritableStream({
     write: async (chunk) => {

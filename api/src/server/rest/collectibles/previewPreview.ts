@@ -40,9 +40,7 @@ export default async function (req: Request, res: Response) {
 
     await s3.pipeTo(previewKey, stream);
 
-    console.time("Generated preview^2 for " + toHex(collectibleId));
     const img = sharp(buf).resize(LOWRES);
-    console.timeEnd("Generated preview^2 for " + toHex(collectibleId));
 
     await s3.upload(preview2Key, await img.toBuffer());
   }
