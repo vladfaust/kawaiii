@@ -259,7 +259,7 @@ Dialog.relative.z-40(:open="open" @close="close")
                 )
                   ChevronLeftIcon.h-12.text-white.drop-shadow.transition.group-hover_opacity-100.group-active_scale-95.md_text-inherit.md_opacity-50.md_drop-shadow-none
 
-                .absolute.z-10.m-12.flex.flex-col.gap-2.rounded-lg.p-6.shadow-lg.backdrop-blur.backdrop-brightness-125.bg-white(
+                .absolute.z-10.m-12.flex.flex-col.gap-2.rounded-lg.bg-white.p-6.shadow-lg.backdrop-blur.backdrop-brightness-125(
                   v-if="content && content.gated && !content.unlocked.value"
                 )
                   p.max-w-xs.text-center.leading-tight
