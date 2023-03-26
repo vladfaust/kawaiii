@@ -12,6 +12,11 @@ const router = createRouter({
       component: () => import("@/components/Home.vue"),
     },
     {
+      path: "/help",
+      name: "Help",
+      component: () => import("@/components/Help.vue"),
+    },
+    {
       name: "NewCollectible",
       path: "/collectible/new",
       component: () => import("@/components/Collectible/New.vue"),

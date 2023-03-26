@@ -158,4 +158,12 @@ Dialog.relative.z-40(
           ref="buttonRef"
           @click="loginModal = true"
         ) Log in to mint
+
+        p.text-center.text-sm.text-base-600
+          | Need help?
+          | Visit our
+          |
+          RouterLink.link(to="/help#collect") help
+          |
+          | page.
 </template>

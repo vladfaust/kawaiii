@@ -27,18 +27,12 @@ import Callout from "./util/Callout.vue";
     | kawaiii.co™️ uses the {{ config.eth.chain.chainName }} network to reduce transaction costs.
     | When you connect your wallet, you will need to approve a chain switch by clicking a button.
 
-  img(
-    src="/help/Screenshot 2023-03-26 at 15.13.45.png"
-    title="Chain switch notification example"
-  )
+  img(src="" title="Chain switch notification example")
 
   p
     | You will also be required to sign a message to prove that you own the wallet.
 
-  img(
-    src="/help/Screenshot 2023-03-26 at 15.12.30.png"
-    title="Signature request example"
-  )
+  img(src="" title="Signature request example")
 
   h2#create Create a Collectible
 
@@ -69,7 +63,7 @@ import Callout from "./util/Callout.vue";
     | Fill in the details of your collectible and click the button to create it.
 
   img.my-12.rounded-xl.border.shadow-2xl(
-    src="/help/Screenshot 2023-03-26 at 15.30.23.png"
+    src=""
     title="Create collectible page example"
   )
 
@@ -81,16 +75,13 @@ import Callout from "./util/Callout.vue";
     | transaction, which means that you will NOT be charged for it.
     | Yes, creating a collectible is free!
 
-  img(
-    src="/help/Screenshot 2023-03-26 at 15.34.26.png"
-    title="Gasless transaction signature example"
-  )
+  img(src="" title="Gasless transaction signature example")
 
   p
     | Once the collectible is created, it will appear in your profile, and will be available to mint by others.
 
   img.my-12.rounded-xl.border.shadow-2xl(
-    src="/help/Screenshot 2023-03-26 at 15.57.23.png"
+    src=""
     title="Collectible post example"
   )
 
@@ -101,7 +92,7 @@ import Callout from "./util/Callout.vue";
     | Owning a copy of a collectible gives you exclusive access to its hidden content.
 
   img.my-12.rounded-xl.border.shadow-2xl(
-    src="/help/Screenshot 2023-03-26 at 15.59.25.png"
+    src=""
     title="Collection interface example"
   )
 
@@ -114,10 +105,7 @@ import Callout from "./util/Callout.vue";
     | to purchase it.
     | To mint a collectible, you need to click a button and confirm the transaction in your wallet.
 
-  img(
-    src="/help/Screenshot 2023-03-26 at 16.01.10.png"
-    title="Minting transaction signature example"
-  )
+  img(src="" title="Minting transaction signature example")
 </template>
 
 <style lang="scss" scoped>

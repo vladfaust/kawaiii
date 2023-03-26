@@ -99,9 +99,8 @@ Dialog.relative(
         .btn.btn-lg.flex.gap-2(v-else-if="state === State.Done")
           span Logged in!
 
-        //- TODO: Redirect to some Metamask tutorial.
         p.text-center.text-sm.text-base-500
           | Need help? Check out our&nbsp;
-          RouterLink.link(to="/help" @click="close") help page
+          RouterLink.link(to="/help#connect" @click="close") help page
           | .
 </template>

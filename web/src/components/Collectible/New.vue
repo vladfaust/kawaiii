@@ -540,13 +540,12 @@ onUnmounted(() => {
   button.btn.btn-primary.btn-lg(@click="create") Create collectible 🪄✨
 
   p.text-center.text-sm.leading-tight.text-base-500
-    | You will be asked to sign a gasless transaction with your crypto wallet, which is completely free.
-    br
-    | You will
+    | You will NOT be charged any fees for the gasless transaction signature.
+    | Visit our
     |
-    strong NOT
+    RouterLink.link(to="/help#create") help
     |
-    | be charged any fees for the signature.
+    | page for more information.
 
   Dialog.relative.z-40(:open="createDialog")
     .fixed.inset-0(class="bg-black/30" aria-hidden="true")
