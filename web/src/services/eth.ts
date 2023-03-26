@@ -61,12 +61,12 @@ export async function connect() {
     // oldNetwork exists, it represents a changing network
     // See https://docs.ethers.io/v5/concepts/best-practices/.
     if (oldNetwork) {
-      window.location.reload();
+      disconnect();
     }
   });
 
   window.ethereum.on("chainChanged", function (chainId: any) {
-    window.location.reload();
+    disconnect();
   });
 }
 
