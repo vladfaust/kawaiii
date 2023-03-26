@@ -3,7 +3,7 @@ import { BigNumber, ethers } from "ethers";
 import { timeout } from "@/utils.js";
 import assert from "assert";
 import konsole from "./konsole";
-import { ERC1155__factory } from "@kawaiii/contracts/typechain";
+import { ERC1155__factory } from "@kawaiiico/contracts/typechain";
 
 let wsProvider: ethers.providers.BaseProvider;
 let httpProvider: ethers.providers.BaseProvider;

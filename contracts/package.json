@@ -1,8 +1,8 @@
 {
-  "name": "@kawaiii/contracts",
-  "version": "1.0.0",
+  "name": "@kawaiiico/contracts",
+  "version": "1.0.1",
   "description": "Kawaiii™️ contracts",
-  "author": "Kawaiii™️ Team <inbox@kawaiii.co>",
+  "author": "Kawaiii™️ Team <inbox@kawaiiico.co>",
   "license": "UNLICENSED",
   "type": "module",
   "engines": {
@@ -44,6 +44,9 @@
   },
   "typesVersions": {
     "*": {
+      "typechain": [
+        "dist/index.d.ts"
+      ],
       "typechain/*": [
         "dist/*"
       ]

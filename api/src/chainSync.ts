@@ -1,10 +1,10 @@
-import { KawaiiiCollectible__factory } from "@kawaiii/contracts/typechain";
+import { KawaiiiCollectible__factory } from "@kawaiiico/contracts/typechain";
 import {
   TransferSingleEvent,
   TransferBatchEvent,
   CreateEvent,
   MintEvent,
-} from "@kawaiii/contracts/typechain/contracts/Collectible.sol/KawaiiiCollectible";
+} from "@kawaiiico/contracts/typechain/contracts/Collectible.sol/KawaiiiCollectible";
 import config from "./config";
 import { toBuffer, toHex } from "./utils";
 import { BigNumber, ethers } from "ethers";

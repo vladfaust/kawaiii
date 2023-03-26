@@ -5,7 +5,7 @@ import { BigNumber } from "ethers";
 import { z } from "zod";
 import { contentKey, collectiblePreviewKey, getUploadUrl } from "@/services/s3";
 import config from "@/config";
-import { KawaiiiCollectible__factory } from "@kawaiii/contracts/typechain";
+import { KawaiiiCollectible__factory } from "@kawaiiico/contracts/typechain";
 import { wallet } from "@/services/eth";
 import { TRPCError } from "@trpc/server";
 import { CollectibleContent, Hex, Hex32 } from "@/schema";

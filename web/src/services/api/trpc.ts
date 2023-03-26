@@ -1,5 +1,5 @@
 import { createTRPCProxyClient, httpBatchLink, loggerLink } from "@trpc/client";
-import type { CommandsRouter } from "@kawaiii/api/trpc";
+import type { CommandsRouter } from "@kawaiiico/api/trpc";
 import config from "@/config";
 
 const commands = createTRPCProxyClient<CommandsRouter>({

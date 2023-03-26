@@ -3,7 +3,7 @@ import config from "@/config";
 import {
   ERC1155__factory,
   KawaiiiCollectible__factory,
-} from "@kawaiii/contracts/typechain";
+} from "@kawaiiico/contracts/typechain";
 import { toHex } from "@/util";
 import { provider, account } from "../eth";
 

@@ -1,8 +1,8 @@
 {
-  "name": "@kawaiii/api",
-  "version": "1.0.0",
+  "name": "@kawaiiico/api",
+  "version": "1.0.1",
   "description": "Kawaiii™️ API",
-  "author": "Kawaiii™️ Team <inbox@kawaiii.co>",
+  "author": "Kawaiii™️ Team <inbox@kawaiiico.co>",
   "license": "UNLICENSED",
   "type": "module",
   "engines": {
@@ -35,7 +35,7 @@
     "@aws-sdk/client-s3": "^3.289.0",
     "@aws-sdk/s3-request-presigner": "^3.289.0",
     "@graphql-yoga/urql-exchange": "^1.6.3",
-    "@kawaiii/contracts": "^1.0.0",
+    "@kawaiiico/contracts": "^1.0.0",
     "@prisma/client": "^4.10.1",
     "@sentry/node": "^7.45.0",
     "@sentry/tracing": "^7.45.0",
