@@ -86,16 +86,18 @@ Dialog.relative.z-40(
   .fixed.inset-0(class="bg-black/30" aria-hidden="true")
   .fixed.inset-0.overflow-y-auto.p-4
     .flex.min-h-full.items-center.justify-center
-      DialogPanel.relative.flex.w-full.max-w-sm.flex-col.gap-3.rounded-xl.bg-white.p-4.shadow-lg
+      DialogPanel.relative.flex.w-full.max-w-lg.flex-col.gap-4.rounded-xl.bg-white.p-6.shadow-lg
         .pressable.absolute.-top-2.-right-2.z-30.flex.h-10.w-10.cursor-pointer.items-center.justify-center.rounded-full.bg-white.shadow-lg.transition-transform(
           @click.stop="emit('close')"
         ) ❌
-        CollectibleCard.mb-1.rounded-lg.shadow-lg(:collectible="collectible")
+        CollectibleCard.mb-1.w-64.self-center.rounded-lg.shadow-lg(
+          :collectible="collectible"
+        )
 
         ul.flex.flex-col.gap-2
           li(v-if="!collectible.capReached.value")
             p.leading-tight
-              | 👉 Upon minting, the collectible appears in your crypto wallet.&nbsp;
+              | 👉 Upon minting, the collectible will appear in your crypto wallet.&nbsp;
               RouterLink.link-hover.inline-flex.items-center.font-bold.tracking-wide(
                 :to="{ name: 'Profile', params: { handle: collectible.creator.value?.handle } }"
                 class="gap-0.5"
@@ -108,24 +110,30 @@ Dialog.relative.z-40(
               | &nbsp;will receive the mint price on their balance.
           li(v-if="!collectible.capReached.value")
             p.leading-tight
-              | 👉 Once all
+              | 👉 Once all of
               strong &nbsp;{{ collectible.editions }}&nbsp;
               | editions are minted, the collectible won't be available to mint anymore.
               | You can still buy it from the secondary market.
               | Right now,
-              strong &nbsp;{{ collectible.totalSupply.value }}/{{ collectible.editions }}&nbsp;
+              |
+              strong {{ collectible.totalSupply.value }}
+              |
+              | of
+              |
+              strong {{ collectible.editions }}
+              |
               | editions are minted.
           li(v-if="exclusiveContentLength")
             p.leading-tight
               | 👉 A holder of this collectible gains exclusive access to&nbsp;
-              strong {{ exclusiveContentLength }} private pictures
+              strong {{ exclusiveContentLength }} private picture(s)
               | .
 
         Callout(:type="'info'" v-if="collectible.collected.value")
           p.leading-tight
-            | You already have this collectible in your wallet (
+            | You already own this collectible (
             strong {{ collectible.balance.value }}
-            | ), which does grant you the access.
+            | ); it grants you access to the hidden content.
             span(v-if="!collectible.capReached.value") &nbsp;You can mint more if you want.
 
         Callout(:type="'info'" v-if="collectible.capReached.value")
