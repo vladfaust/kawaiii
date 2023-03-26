@@ -241,6 +241,8 @@ Dialog.relative.z-40(:open="open" @close="close")
               v-if="collectible"
               :collectible="collectible"
               :showGallery="false"
+              :show-actions="true"
+              :show-description="true"
               :key="toHex(collectible.id)"
             )
 

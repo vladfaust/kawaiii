@@ -14,9 +14,11 @@ import Placeholder from "../util/Placeholder.vue";
 import { CheckBadgeIcon } from "@heroicons/vue/20/solid";
 import { loginModal, userId } from "@/modules/auth";
 
-const { collectible, showGallery } = defineProps<{
+const { collectible, showGallery, showActions, showDescription } = defineProps<{
   collectible: Collectible;
   showGallery?: boolean;
+  showActions?: boolean;
+  showDescription?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -117,7 +119,7 @@ function checkLoggedIn() {
     .flex.flex-col
       span.text-lg.font-semibold.leading-tight {{ collectible.name }}
       Markdown.leading-tight(
-        v-if="collectible.description"
+        v-if="collectible.description && showDescription"
         :source="collectible.description"
         :breaks="true"
       )
@@ -131,7 +133,7 @@ function checkLoggedIn() {
       :alt="collectible.name"
       @click="emit('chooseContent', undefined)"
     )
-    .flex.justify-between
+    .flex.justify-between(v-if="showActions")
       .flex.gap-2
         button.btn(
           tabindex="-1"

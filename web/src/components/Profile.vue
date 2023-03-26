@@ -297,6 +297,8 @@ const tab = ref(Tab.Created);
             style="grid-template-rows: 1fr"
             :collectible="collectible"
             :show-gallery="true"
+            :show-actions="true"
+            :show-description="true"
             @choose-content="(e) => { setGallery(created, collectible, e); }"
             :key="toHex(collectible.id)"
           )
@@ -314,6 +316,8 @@ const tab = ref(Tab.Created);
             style="grid-template-rows: 1fr"
             :collectible="collectible"
             :show-gallery="true"
+            :show-actions="true"
+            :show-description="true"
             @choose-content="(e) => { setGallery(liked, collectible, e); }"
             :key="toHex(collectible.id)"
           )
@@ -331,6 +335,8 @@ const tab = ref(Tab.Created);
             style="grid-template-rows: 1fr"
             :collectible="collectible"
             :show-gallery="true"
+            :show-actions="true"
+            :show-description="true"
             @choose-content="(e) => { setGallery(collected, collectible, e); }"
             :key="toHex(collectible.id)"
           )
