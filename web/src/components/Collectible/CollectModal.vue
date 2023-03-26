@@ -62,7 +62,6 @@ async function collect() {
       title: "Minted! 🎉",
       text: "The collectible has been added to your wallet.",
       type: "success",
-      duration: -1,
     });
 
     collectible.fetchBalance();
