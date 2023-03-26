@@ -39,6 +39,8 @@ const galleryContent = shallowRef<Content | undefined>();
     :key="toHex(collectible.id)"
     :collectible="collectible"
     :show-gallery="true"
+    :show-actions="true"
+    :show-description="true"
     @choose-content="(content) => { galleryCollectible = collectible; galleryContent = content; }"
   )
   p.flex.h-full.flex-col.items-center.justify-center.p-8.text-center.text-base-600(
