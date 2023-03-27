@@ -61,7 +61,7 @@ model Collectible {
 
   name        String
   description String?
-  mintPrice   Bytes // In wei // TODO: Change to BigInt
+  mintPrice   Bytes // BigNumber
   editions    Int
   royalty     Int // 0-255
 
@@ -104,7 +104,7 @@ model CollectibleBalance {
   userId        String
   collectibleId String
 
-  balance BigInt
+  balance Int // It won't exceed editions
 
   updatedAt DateTime @updatedAt
 
@@ -150,10 +150,10 @@ model CollectibleMintEvent {
   logIndex    Int
   txHash      String
 
-  amount   BigInt
-  income   BigInt
-  ownerFee BigInt
-  profit   BigInt
+  amount   Bytes // BigNumber
+  income   Bytes // BigNumber
+  ownerFee Bytes // BigNumber
+  profit   Bytes // BigNumber
 
   createdAt DateTime @default(now()) // Block timestamp
 
@@ -173,7 +173,7 @@ model CollectibleTransferEvent {
   subIndex    Int
   txHash      String
 
-  value BigInt
+  value Bytes // BigNumber
 
   createdAt DateTime @default(now()) // Block timestamp
 

@@ -37,10 +37,10 @@ type CollectibleMintEventData = BaseEvent & {
   /** Database collectible ID. */
   collectibleId: string;
 
-  amount: bigint;
-  income: bigint;
-  ownerFee: bigint;
-  profit: bigint;
+  amount: Buffer;
+  income: Buffer;
+  ownerFee: Buffer;
+  profit: Buffer;
 };
 
 type CollectibleTransferEventData = BaseEvent & {
@@ -54,7 +54,7 @@ type CollectibleTransferEventData = BaseEvent & {
   collectibleId: string;
 
   subIndex: number;
-  value: bigint;
+  value: Buffer;
 };
 
 async function blockTimestamp(blockNumber: number): Promise<Date> {
@@ -239,10 +239,10 @@ async function syncMintEvents() {
         blockNumber: log.blockNumber,
         logIndex: log.logIndex,
         txHash: log.transactionHash,
-        amount: parsed.args.amount.toBigInt(),
-        income: parsed.args.income.toBigInt(),
-        ownerFee: parsed.args.ownerFee.toBigInt(),
-        profit: parsed.args.profit.toBigInt(),
+        amount: toBuffer(parsed.args.amount),
+        income: toBuffer(parsed.args.income),
+        ownerFee: toBuffer(parsed.args.ownerFee),
+        profit: toBuffer(parsed.args.profit),
         createdAt: await blockTimestamp(log.blockNumber),
       },
     ];
@@ -306,13 +306,13 @@ async function insertTransferEvent(event: CollectibleTransferEventData) {
           },
           update: {
             balance: {
-              increment: event.value,
+              increment: BigNumber.from(event.value).toNumber(),
             },
           },
           create: {
             userId: event.toId,
             collectibleId: event.collectibleId,
-            balance: event.value,
+            balance: BigNumber.from(event.value).toNumber(),
           },
         });
       }
@@ -327,13 +327,13 @@ async function insertTransferEvent(event: CollectibleTransferEventData) {
           },
           update: {
             balance: {
-              decrement: event.value,
+              decrement: BigNumber.from(event.value).toNumber(),
             },
           },
           create: {
             userId: event.fromId,
             collectibleId: toHex(event.collectibleId),
-            balance: -event.value,
+            balance: -BigNumber.from(event.value).toNumber(),
           },
         });
       }
@@ -360,7 +360,7 @@ async function syncTransferSingleEvents() {
         logIndex: log.logIndex,
         subIndex: 0,
         txHash: log.transactionHash,
-        value: parsed.args.value.toBigInt(),
+        value: toBuffer(parsed.args.value),
         createdAt: await blockTimestamp(log.blockNumber),
       },
     ];
@@ -415,7 +415,7 @@ async function syncTransferBatchEvents() {
         logIndex: log.logIndex,
         subIndex: index,
         txHash: log.transactionHash,
-        value: parsed.args.values[index].toBigInt(),
+        value: toBuffer(parsed.args.values[index]),
         createdAt: await blockTimestamp(log.blockNumber),
       }))
     );
