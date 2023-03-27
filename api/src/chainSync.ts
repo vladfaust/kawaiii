@@ -112,18 +112,19 @@ async function syncHistoricalEvents<T extends BaseEvent>(
 
   // Query for all contract logs from the latest block to the current block.
   while (fromBlock < latestChainBlockNumber) {
-    console.log(`Querying historical logs from block ${fromBlock}`);
+    const toBlock = Math.min(latestChainBlockNumber, fromBlock + BATCH_LIMIT);
 
+    console.log(`Querying for logs from block ${fromBlock} to ${toBlock}`);
     const logs = await httpProvider.getLogs({
       fromBlock,
-      toBlock: Math.min(latestChainBlockNumber, fromBlock + BATCH_LIMIT),
+      toBlock,
       address: toHex(config.eth.collectibleContractAddress),
       topics: [[topic]],
     });
 
     if (!logs.length) {
-      console.log("No historical logs found");
-      break;
+      fromBlock = toBlock;
+      continue;
     }
 
     // Filter out repeated logs.
@@ -134,8 +135,8 @@ async function syncHistoricalEvents<T extends BaseEvent>(
           !logIndicesFromTheLatestBlock.includes(l.logIndex)
       )
     ) {
-      console.log("No new historical logs found");
-      break;
+      fromBlock = toBlock;
+      continue;
     }
 
     const events = (await Promise.all(logs.map(logMapFn)))
@@ -452,8 +453,16 @@ async function syncTransferBatchEvents() {
 }
 
 export async function sync() {
-  await syncCreateEvents();
-  await syncMintEvents();
-  await syncTransferSingleEvents();
-  await syncTransferBatchEvents();
+  const unsubscribes = await Promise.all([
+    syncCreateEvents(),
+    syncMintEvents(),
+    syncTransferSingleEvents(),
+    syncTransferBatchEvents(),
+  ]);
+
+  return () => {
+    for (const unsubscribe of unsubscribes) {
+      unsubscribe();
+    }
+  };
 }
