@@ -64,14 +64,16 @@ export default async function (
       return res.status(401);
     }
 
-    if (user.id === content.Collectible.creatorId) {
-      return next(); // Creator can access their gated content.
-    }
+    // Creator can access their gated content.
+    if (user.id !== content.Collectible.creatorId) {
+      const balance = await balanceOfCollectible(
+        collectibleId,
+        user.evmAddress
+      );
 
-    const balance = await balanceOfCollectible(collectibleId, user.evmAddress);
-
-    if (balance.lt(1)) {
-      return res.status(402).send("Not enough balance");
+      if (balance.lt(1)) {
+        return res.status(402).send("Not enough balance");
+      }
     }
   }
 
