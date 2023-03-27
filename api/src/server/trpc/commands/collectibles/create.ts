@@ -6,7 +6,7 @@ import { z } from "zod";
 import { contentKey, collectiblePreviewKey, getUploadUrl } from "@/services/s3";
 import config from "@/config";
 import { KawaiiiCollectible__factory } from "@kawaiiico/contracts/typechain";
-import { wallet } from "@/services/eth";
+import { httpProvider, wallet } from "@/services/eth";
 import { TRPCError } from "@trpc/server";
 import { CollectibleContent, Hex, Hex32 } from "@/schema";
 
@@ -65,13 +65,19 @@ export default protectedProcedure
       wallet
     );
 
+    const feeData = await httpProvider.getFeeData();
+
     const tx = await contract.createWithSignature(
       toHex(user.evmAddress),
       input.id,
       input.editions,
       input.mintPrice,
       input.royalty,
-      toBuffer(input.signature)
+      toBuffer(input.signature),
+      {
+        maxFeePerGas: feeData.maxFeePerGas || undefined,
+        maxPriorityFeePerGas: feeData.maxPriorityFeePerGas || undefined,
+      }
     );
 
     const collectible = await prisma.collectible.create({
