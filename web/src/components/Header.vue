@@ -3,6 +3,7 @@ import User from "@/model/User";
 import { userId, loginModal } from "@/modules/auth";
 import { shallowRef, watch } from "vue";
 import PFP from "./PFP.vue";
+import Jdenticon from "./util/Jdenticon.vue";
 
 // REFACTOR: Move user to the auth store.
 const user = shallowRef<User | undefined>();
@@ -38,9 +39,10 @@ header.flex.h-16.w-full.place-content-center.border-b.px-4
           )
             span.hidden.sm_inline Create
             span.sm_hidden ✨
-        li.h-full(v-if="user")
+        li.h-full(v-if="userId")
           RouterLink._link.gap-2(:to="{ name: 'Me' }")
-            PFP.h-8.rounded-full(:user="user" :key="user.id")
+            PFP.h-8.rounded-full(v-if="user" :user="user" :key="user.id")
+            Jdenticon.h-8.rounded-full(v-else :input="userId" :key="userId")
       template(v-else)
         .hidden.sm_contents
           li._link.h-full.shrink-0
