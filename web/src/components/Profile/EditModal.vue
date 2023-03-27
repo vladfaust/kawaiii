@@ -132,9 +132,10 @@ async function save() {
   ) {
     promises.push(
       trpc.commands.users.update.mutate({
-        handle: handle.value !== props.user.handle ? handle.value : undefined,
-        name: name.value !== props.user.name ? name.value : undefined,
-        bio: bio.value !== props.user.bio ? bio.value : undefined,
+        handle:
+          handle.value !== props.user.handle ? handle.value || null : undefined,
+        name: name.value !== props.user.name ? name.value || null : undefined,
+        bio: bio.value !== props.user.bio ? bio.value || null : undefined,
       })
     );
   }

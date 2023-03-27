@@ -9,9 +9,9 @@ const prisma = new PrismaClient();
 export default protectedProcedure
   .input(
     z.object({
-      handle: z.string().min(8).max(32).optional(),
-      name: z.string().min(1).max(32).optional(),
-      bio: z.string().max(1024).optional(),
+      handle: z.string().min(8).max(32).nullable().optional(),
+      name: z.string().min(1).max(32).nullable().optional(),
+      bio: z.string().max(1024).nullable().optional(),
     })
   )
   .mutation(async ({ input, ctx }) => {
