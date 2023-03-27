@@ -130,10 +130,8 @@ function keydown(event: KeyboardEvent) {
 watchEffect(() => {
   if (props.open) {
     document.addEventListener("keydown", keydown);
-    console.log("added");
   } else {
     document.removeEventListener("keydown", keydown);
-    console.log("removed");
   }
 });
 
