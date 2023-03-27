@@ -12,6 +12,14 @@ import config from "./config";
 const app = createApp(App);
 
 if (config.sentry) {
+  console.log("Sentry enabled", {
+    dsn: config.sentry.dsn,
+    debug:
+      config.sentry.debug !== undefined
+        ? config.sentry.debug
+        : import.meta.env.DEV,
+  });
+
   Sentry.init({
     app,
     dsn: config.sentry.dsn,
