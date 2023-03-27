@@ -1,6 +1,6 @@
 {
   "name": "@kawaiiico/api",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Kawaiii™️ API",
   "author": "Kawaiii™️ Team <inbox@kawaiiico.co>",
   "license": "UNLICENSED",
@@ -34,20 +34,17 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.289.0",
     "@aws-sdk/s3-request-presigner": "^3.289.0",
-    "@graphql-yoga/urql-exchange": "^1.6.3",
     "@kawaiiico/contracts": "^1.0.0",
     "@prisma/client": "^4.10.1",
     "@sentry/node": "^7.45.0",
     "@sentry/tracing": "^7.45.0",
     "@trpc/server": "^10.11.1",
-    "@urql/core": "^3.2.2",
     "chalk": "^5.2.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
     "express": "^4.18.2",
-    "graphql": "^16.6.0",
     "ioredis": "^5.3.1",
     "morgan": "^1.10.0",
     "nanoid": "^4.0.1",
@@ -56,7 +53,6 @@
     "prisma": "^4.10.1",
     "sharp": "^0.31.3",
     "web3-token": "^1.0.4",
-    "wonka": "^6.2.5",
     "zod": "^3.20.6"
   },
   "files": [
