@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import User from "@/model/User";
 import { trpc } from "@/services/api";
-import { shallowRef } from "vue";
+import { onMounted, shallowRef } from "vue";
 import PFP from "@/components/PFP.vue";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/vue";
 import { CheckBadgeIcon } from "@heroicons/vue/20/solid";
@@ -12,11 +12,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const followees = shallowRef<User[]>(
-  await Promise.all(
-    (await trpc.commands.users.getFollowees.query()).map((id) => User.get(id))
-  )
-);
+const followees = shallowRef<User[]>();
 
 async function follow(followee: User) {
   try {
@@ -35,6 +31,12 @@ async function unfollow(followee: User) {
     console.error(e);
   }
 }
+
+onMounted(async () => {
+  followees.value = await Promise.all(
+    (await trpc.commands.users.getFollowees.query()).map((id) => User.get(id))
+  );
+});
 </script>
 
 <template lang="pug">

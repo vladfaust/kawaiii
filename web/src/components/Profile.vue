@@ -4,7 +4,14 @@ import Content from "@/model/Collectible/Content";
 import User from "@/model/User";
 import { trpc } from "@/services/api";
 import { Deferred } from "@/util/deferred";
-import { computed, ref, shallowRef, triggerRef, type ShallowRef } from "vue";
+import {
+  computed,
+  onMounted,
+  ref,
+  shallowRef,
+  triggerRef,
+  type ShallowRef,
+} from "vue";
 import ContentCard from "./Collectible/Content/Card.vue";
 import CollectiblePost from "./Collectible/Post.vue";
 import Markdown from "vue3-markdown-it";
@@ -23,70 +30,17 @@ const { user } = defineProps<{
   user: Deferred<User | null>;
 }>();
 
-await user.promise;
-
 const galleryCollectibles = shallowRef<Collectible[]>([]);
 const galleryCollectible = shallowRef<Collectible | undefined>();
 const galleryContent = shallowRef<Content | undefined>();
 
+// TODO: Lazy loading.
 const created: ShallowRef<Collectible[]> = shallowRef([]);
 const liked: ShallowRef<Collectible[]> = shallowRef([]);
 const collected: ShallowRef<Collectible[]> = shallowRef([]);
+
 const followeesCount = ref(0);
 const isSelf = computed(() => user.value?.id == userId.value);
-
-if (user.value) {
-  const promises = [
-    trpc.commands.collectibles.listByCreator
-      .query({ creatorId: user.value.id })
-      .then((ids) =>
-        ids.forEach((id) =>
-          Collectible.get(toUint8Array(id)).then((c) => {
-            created.value.push(c);
-            triggerRef(created);
-          })
-        )
-      ),
-
-    trpc.commands.collectibles.listLiked
-      .query({ userId: user.value.id })
-      .then((ids) =>
-        ids.forEach((id) =>
-          Collectible.get(toUint8Array(id)).then((c) => {
-            liked.value.push(c);
-            triggerRef(liked);
-          })
-        )
-      ),
-
-    trpc.commands.collectibles.indexCollected
-      .query({
-        userId: user.value.id,
-      })
-      .then((ids) =>
-        ids.forEach((id) =>
-          Collectible.get(toUint8Array(id)).then((collectible) => {
-            collected.value.push(collectible);
-            triggerRef(collected);
-          })
-        )
-      ),
-  ];
-
-  if (isSelf.value) {
-    promises.push(
-      trpc.commands.users.getFolloweesCount.query().then((count) => {
-        followeesCount.value = count;
-      })
-    );
-  }
-
-  await Promise.all(promises).then(() => {
-    nProgress.done();
-  });
-} else {
-  nProgress.done();
-}
 
 const bgpSrc = computed(() =>
   user.value?.bgpVersion ? user.value.bgpUrl.toString() : undefined
@@ -109,7 +63,7 @@ const editModal = ref(false);
 
 function onUserUpdate() {
   editModal.value = false;
-  window.location.reload();
+  window.location.reload(); // TODO: Would not want to reload
 }
 
 const followeesModal = ref(false);
@@ -163,116 +117,187 @@ enum Tab {
 }
 
 const tab = ref(Tab.Created);
+
+onMounted(async () => {
+  await user.promise;
+
+  if (user.value) {
+    const promises = [
+      trpc.commands.collectibles.listByCreator
+        .query({ creatorId: user.value.id })
+        .then((ids) =>
+          ids.forEach((id) =>
+            Collectible.get(toUint8Array(id)).then((c) => {
+              created.value.push(c);
+              triggerRef(created);
+            })
+          )
+        ),
+
+      trpc.commands.collectibles.listLiked
+        .query({ userId: user.value.id })
+        .then((ids) =>
+          ids.forEach((id) =>
+            Collectible.get(toUint8Array(id)).then((c) => {
+              liked.value.push(c);
+              triggerRef(liked);
+            })
+          )
+        ),
+
+      trpc.commands.collectibles.indexCollected
+        .query({
+          userId: user.value.id,
+        })
+        .then((ids) =>
+          ids.forEach((id) =>
+            Collectible.get(toUint8Array(id)).then((collectible) => {
+              collected.value.push(collectible);
+              triggerRef(collected);
+            })
+          )
+        ),
+    ];
+
+    if (isSelf.value) {
+      promises.push(
+        trpc.commands.users.getFolloweesCount.query().then((count) => {
+          followeesCount.value = count;
+        })
+      );
+    }
+
+    await Promise.all(promises).then(() => {
+      nProgress.done();
+    });
+  } else {
+    nProgress.done();
+  }
+});
 </script>
 
 <template lang="pug">
-.m-4.flex.w-full.max-w-3xl.flex-col.gap-3
-  template(v-if="user.resolved")
-    template(v-if="user.value")
-      .flex.flex-col.gap-4
-        .w-full.overflow-hidden.rounded-lg(style="aspect-ratio: 16/4.5")
+.m-4.flex.min-h-full.w-full.max-w-3xl.flex-col.gap-3
+  template(v-if="user.value !== null")
+    .flex.flex-col.gap-4
+      .w-full.overflow-hidden.rounded-lg(style="aspect-ratio: 16/4.5")
+        template(v-if="user.value")
           Placeholder.h-full.w-full.bg-base-100(
             v-if="!bgpUseImage || bgpUseImage.isLoading.value"
             :animated="!!bgpUseImage && !bgpUseImage.isLoading.value"
-            :title="(user.value.name || 'This user') + `'s background`"
+            :title="(user.value?.name || 'This user') + `'s background`"
           )
           img.bg-checkerboard.w-full.bg-fixed.object-cover(
             style="aspect-ratio: 16/4.5"
             v-else-if="bgpSrc"
             :src="bgpSrc"
-            :alt="(user.value.name || 'This user') + `'s background`"
+            :alt="(user.value?.name || 'This user') + `'s background`"
           )
+        Placeholder.h-full.w-full.bg-base-100(v-else)
 
-        .z-10.-mt-4.flex.flex-col.gap-2
-          .flex.justify-between.py-2.pl-2
-            .-mt-16.w-32.overflow-hidden.rounded-full.bg-white.p-1
-              PFP.h-full.w-full.rounded-full.object-cover(:user="user.value")
-            .flex.gap-2
-              template(v-if="isSelf")
-                button.btn.h-max.w-max(@click="editModal = true") Edit 📝
-                button.btn.btn-error.h-max.w-max(@click="logout") Logout
-              template(v-else)
-                button.btn.btn-ghost.h-max.w-max(
-                  v-if="user.value.isMeFollowing.value"
-                  @click="unfollow"
-                  :disabled="followingInProcess"
-                ) Unfollow
-                button.btn.btn-primary.h-max.w-max(
-                  v-else
-                  @click="follow"
-                  :disabled="followingInProcess"
-                ) Follow
+      .z-10.-mt-4.flex.flex-col.gap-2
+        .flex.justify-between.py-2.pl-2
+          .-mt-16.w-32.overflow-hidden.rounded-full.bg-white.p-1
+            PFP.h-full.w-full.rounded-full.object-cover(
+              v-if="user.value"
+              :user="user.value"
+            )
+            Placeholder.aspect-square.h-full.rounded-full.bg-base-100(v-else)
+          .flex.gap-2
+            template(v-if="isSelf")
+              button.btn.h-max.w-max(@click="editModal = true") Edit 📝
+              button.btn.btn-error.h-max.w-max(@click="logout") Logout
+            template(v-else-if="user.value")
+              button.btn.btn-ghost.h-max.w-max(
+                v-if="user.value.isMeFollowing.value"
+                @click="unfollow"
+                :disabled="followingInProcess"
+              ) Unfollow
+              button.btn.btn-primary.h-max.w-max(
+                v-else
+                @click="follow"
+                :disabled="followingInProcess"
+              ) Follow
 
-          .flex.flex-col.gap-2
-            .flex.flex-col.gap-1
-              span.leading-none
-                span.text-xl.font-bold.leading-none.tracking-wide(
-                  v-if="user.value.name"
-                ) {{ user.value.name }}
-                span.text-xl.font-bold.leading-none.tracking-wide.text-base-400(
-                  v-else
-                ) Anonymous
-                CheckBadgeIcon.inline-block.h-5.align-text-top.text-blue-500(
-                  v-if="user.value.verified"
-                  v-tippy="{ content: 'Verified' }"
-                )
-                span.leading-none.text-base-400(v-if="user.value.id == userId") &nbsp;(you)
+        .flex.flex-col.gap-2
+          .flex.flex-col.gap-1
+            span.leading-none(v-if="user.value")
+              span.text-xl.font-bold.leading-none.tracking-wide(
+                v-if="user.value.name"
+              ) {{ user.value.name }}
+              span.text-xl.font-bold.leading-none.tracking-wide.text-base-400(
+                v-else
+              ) Anonymous
+              CheckBadgeIcon.inline-block.h-5.align-text-top.text-blue-500(
+                v-if="user.value.verified"
+                v-tippy="{ content: 'Verified' }"
+              )
+              span.leading-none.text-base-400(v-if="user.value.id == userId") &nbsp;(you)
+            Placeholder.h-5.w-64.rounded.bg-base-100(v-else)
 
+            template(v-if="user.value")
               RouterLink.text.link-hover.w-min.leading-none.text-base-500(
                 v-if="user.value.handle"
                 :to="{ name: 'Profile', params: { handle: user.value.handle } }"
               ) @{{ user.value.handle }}
               span.text.italic.leading-none.text-base-400(v-else) @undefined
+            Placeholder.h-4.w-32.rounded.bg-base-100(v-else)
 
-            .mt-1.flex.gap-2
-              span
-                span.font-semibold {{ user.value.collectorsCount.value }}
-                span.text-base-500 &nbsp;collectors
-              span
-                span.font-semibold {{ user.value.followersCount.value }}
-                span.text-base-500 &nbsp;followers
+          .flex.gap-2
+            span(v-if="user.value")
+              span.font-semibold {{ user.value.collectorsCount.value }}
+              span.text-base-500 &nbsp;collectors
+            Placeholder.h-4.w-16.rounded.bg-base-100(v-else)
+
+            span(v-if="user.value")
+              span.font-semibold {{ user.value.followersCount.value }}
+              span.text-base-500 &nbsp;followers
+            Placeholder.h-4.w-16.rounded.bg-base-100(v-else)
+
+            template(v-if="user.value")
               span.link-hover.cursor-pointer(
-                v-if="followeesCount"
+                v-if="isSelf"
                 @click="followeesModal = true"
               )
                 span.font-semibold {{ followeesCount }}
                 span.text-base-500 &nbsp;followees
-              span
-                span.font-semibold {{ user.value.likesReceived }}
-                span.text-base-500 &nbsp;likes
-              //- span
-              //-   span.font-semibold {{ created.reduce((acc, c) => (acc += c.photosLength), 0) }}
-              //-   span.text-base-500 &nbsp;photos
+            Placeholder.h-4.w-16.rounded.bg-base-100(v-else)
 
-            //- .flex.items-center.justify-between.gap-3
-            //-   h2.shrink-0.text-xl.font-semibold About 🐾
-            //-   .h-px.w-full.bg-base-100
+            span(v-if="user.value")
+              span.font-semibold {{ user.value.likesReceived }}
+              span.text-base-500 &nbsp;likes
+            Placeholder.h-4.w-16.rounded.bg-base-100(v-else)
 
+          template(v-if="user.value")
             Markdown.prose.flex.flex-col.leading-tight(
               v-if="user.value.bio"
               :source="user.value.bio"
               :breaks="true"
             )
-            //- p.text-base-400(v-else) Empty
+          .flex.flex-col.gap-1(v-else)
+            Placeholder.h-4.w-full.rounded.bg-base-100
+            Placeholder.h-4.w-full.rounded.bg-base-100
+            Placeholder.h-4.w-full.rounded.bg-base-100
 
-        template(v-if="created.length")
-          .flex.items-center.justify-between.gap-3
-            h2.shrink-0.text-xl.font-semibold Gallery 🖼
-            .h-px.w-full.bg-base-100
-            span.shrink-0.text-sm.text-base-500 {{ created.reduce((acc, c) => (acc += c.photosLength), 0) }} photos
+      template(v-if="created.length")
+        .flex.items-center.justify-between.gap-3
+          h2.shrink-0.text-xl.font-semibold Gallery 🖼
+          .h-px.w-full.bg-base-100
+          span.shrink-0.text-sm.text-base-500 {{ created.reduce((acc, c) => (acc += c.photosLength), 0) }} photos
 
-          ._gallery.flex.max-h-72.w-full.flex-wrap.gap-2.overflow-y-auto.rounded-lg
-            template(
-              v-for="collectible in created.sort((a, b) => b.createdAt.valueOf() - a.createdAt.valueOf())"
+        ._gallery.flex.max-h-72.w-full.flex-wrap.gap-2.overflow-y-auto.rounded-lg
+          template(
+            v-for="collectible in created.sort((a, b) => b.createdAt.valueOf() - a.createdAt.valueOf())"
+          )
+            ContentCard.pressable.flex-shrink-0.cursor-pointer.rounded-lg.transition-transform(
+              :content="content"
+              v-for="content in collectible.content"
+              :key="content.name"
+              :preview="content.gated"
+              @click="setGallery(created, collectible, content)"
             )
-              ContentCard.pressable.flex-shrink-0.cursor-pointer.rounded-lg.transition-transform(
-                :content="content"
-                v-for="content in collectible.content"
-                :key="content.name"
-                :preview="content.gated"
-                @click="setGallery(created, collectible, content)"
-              )
 
+      template(v-if="user.value")
         .flex.items-center.justify-between.gap-3
           h2.shrink-0.text-xl.font-semibold Collectibles 🧸
           .h-px.w-full.bg-base-100
@@ -315,7 +340,7 @@ const tab = ref(Tab.Created);
           )
           p.p-8.text-center.text-lg.leading-snug.text-base-500(v-else)
             span(v-if="isSelf") You
-            span.font-bold(v-else-if="user.value.name") {{ user.value.name }}
+            span.font-bold(v-else-if="user.value?.name") {{ user.value.name }}
             span(v-else) This user
             |
             | {{  (isSelf ? "haven't" : "hasn't")  }} created anything yet. 🤔
@@ -334,7 +359,7 @@ const tab = ref(Tab.Created);
           )
           p.p-8.text-center.text-lg.leading-snug.text-base-500(v-else)
             span(v-if="isSelf") You
-            span.font-bold(v-else-if="user.value.name") {{ user.value.name }}
+            span.font-bold(v-else-if="user.value?.name") {{ user.value.name }}
             span(v-else) This user
             |
             | {{  (isSelf ? "haven't" : "hasn't")  }} liked anything yet. 💔
@@ -354,33 +379,35 @@ const tab = ref(Tab.Created);
           p.p-8.text-center.text-lg.leading-snug.text-base-500(v-else)
             span You haven't collected anything yet. 💁‍♂️
 
-      GalleryModal(
-        :open="galleryCollectible !== undefined"
-        :collectibles="galleryCollectibles"
-        :collectible="galleryCollectible"
-        :content="galleryContent"
-        @close="() => { galleryContent = undefined; galleryCollectible = undefined; }"
-        @choose-content="galleryContent = $event"
-        @choose-collectible="(e) => { galleryContent = undefined; galleryCollectible = e; }"
-      )
+        GalleryModal(
+          :open="galleryCollectible !== undefined"
+          :collectibles="galleryCollectibles"
+          :collectible="galleryCollectible"
+          :content="galleryContent"
+          @close="() => { galleryContent = undefined; galleryCollectible = undefined; }"
+          @choose-content="galleryContent = $event"
+          @choose-collectible="(e) => { galleryContent = undefined; galleryCollectible = e; }"
+        )
 
-      EditModal(
-        :open="editModal"
-        :user="user.value"
-        @close="editModal = false"
-        @update="onUserUpdate"
-      )
+        EditModal(
+          v-if="isSelf"
+          :open="editModal"
+          :user="user.value"
+          @close="editModal = false"
+          @update="onUserUpdate"
+        )
 
-      FolloweesModal(
-        v-if="isSelf"
-        :open="followeesModal"
-        @close="followeesModal = false"
-      )
+        FolloweesModal(
+          v-if="isSelf"
+          :open="followeesModal"
+          @close="followeesModal = false"
+        )
 
-    template(v-else)
-      h1 Not found
-  template(v-else)
-    h1 Loading...
+  p.flex.h-full.flex-col.items-center.justify-center.p-8.text-center.text-base-600(
+    v-else
+  )
+    span.text-lg.font-semibold.leading-tight Can't find this user.
+    span.leading-tight Try again later maybe? 🤔
 </template>
 
 <style lang="scss">

@@ -5,7 +5,6 @@ import { useRoute, useRouter } from "vue-router";
 import nProgress from "nprogress";
 import { computed, onMounted } from "vue";
 import { autoConnect } from "./services/eth";
-import Spinner from "./components/util/Spinner.vue";
 import LoginModal from "./components/LoginModal.vue";
 import { userId } from "./modules/auth";
 
@@ -40,12 +39,7 @@ HeaderVue(v-if="includeHeader")
   :style="`min-height: calc(100vh - ${includeHeader ? '8rem' : '0'})`"
 )
   RouterView(v-slot="{ Component }")
-    Transition(name="fade" mode="out-in")
-      Suspense
-        template(#default)
-          Component(:is="Component" :key="route.path")
-        template(#fallback)
-          Spinner.animate-spin.text-primary-500
+    Component(:is="Component" :key="route.path")
 FooterVue(v-if="includeHeader")
 LoginModal
 .hidden(class="sm_w-3/5")
