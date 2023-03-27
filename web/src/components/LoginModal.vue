@@ -87,7 +87,7 @@ Dialog.relative(
               href="https://metamask.io/"
               class="gap-0.5"
             )
-              img.inline-block.h-5(src="/metamask.svg" alt="MetaMask logo")
+              img.inline-block.h-5(src="/img/metamask.svg" alt="MetaMask logo")
               | MetaMask
             |
             | installed.
