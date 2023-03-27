@@ -65,8 +65,6 @@ export default protectedProcedure
       wallet
     );
 
-    const feeData = await httpProvider.getFeeData();
-
     const tx = await contract.createWithSignature(
       toHex(user.evmAddress),
       input.id,
@@ -75,8 +73,7 @@ export default protectedProcedure
       input.royalty,
       toBuffer(input.signature),
       {
-        maxFeePerGas: feeData.maxFeePerGas || undefined,
-        maxPriorityFeePerGas: feeData.maxPriorityFeePerGas || undefined,
+        gasPrice: (await httpProvider.getGasPrice()).mul(110).div(100),
       }
     );
 
