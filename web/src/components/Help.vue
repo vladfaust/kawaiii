@@ -63,7 +63,7 @@ import Callout from "./util/Callout.vue";
   p
     | To create a collectible, fill in the details of your collectible and click the button to create it.
 
-  img(src="/img/help/3.png" title="Create collectible page example")
+  img(src="/img/help/3.jpg" title="Create collectible page example")
 
   p
     | Creating a collectible implies signing a
@@ -81,7 +81,7 @@ import Callout from "./util/Callout.vue";
   p
     | Once the collectible is created, it will appear in your profile, and will be available to mint by others.
 
-  img(src="/img/help/5.png" title="Collectible post example")
+  img(src="/img/help/5.jpg" title="Collectible post example")
 
   h2#collect
     a.link-hover(href="#collect") Collect Your Collectibles
@@ -90,7 +90,7 @@ import Callout from "./util/Callout.vue";
     | When you find a collectible you like, you can mint it to get a copy.
     | Owning a copy of a collectible gives you exclusive access to its hidden content.
 
-  img(src="/img/help/6.png" title="Collection interface example")
+  img(src="/img/help/6.jpg" title="Collection interface example")
 
   p
     | Minting a collectible requires you to pay for it using {{ config.eth.chain.nativeCurrency.symbol }}, which is the currency used on the {{ config.eth.chain.chainName }} network.
@@ -109,8 +109,8 @@ import Callout from "./util/Callout.vue";
   p
     | Once the transaction is complete, the collectible will appear in your profile, and you will be able to access its hidden content. 🎉
 
-  img(src="/img/help/8.png" title="Owned collectible example")
-  img(src="/img/help/9.png" title="Content view example")
+  img(src="/img/help/8.jpg" title="Owned collectible example")
+  img(src="/img/help/9.jpg" title="Content view example")
 </template>
 
 <style lang="scss" scoped>
