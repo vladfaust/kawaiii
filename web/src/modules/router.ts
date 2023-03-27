@@ -21,6 +21,13 @@ const router = createRouter({
       name: "NewCollectible",
       path: "/collectible/new",
       component: () => import("@/components/Collectible/New.vue"),
+      beforeEnter: (to, from, next) => {
+        if (!userId.value) {
+          next({ name: "Home" });
+        } else {
+          next();
+        }
+      },
     },
     {
       name: "Me",
