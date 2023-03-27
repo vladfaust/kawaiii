@@ -7,6 +7,7 @@ import { Dialog, DialogPanel, DialogTitle } from "@headlessui/vue";
 import { uploadFile } from "@/modules/axios";
 import Spinner from "../util/Spinner.vue";
 import { onBeforeRouteLeave } from "vue-router";
+import { useNProgress } from "@vueuse/integrations/useNProgress";
 
 const HANDLE_MIN = 8;
 const HANDLE_MAX = 32;
@@ -15,6 +16,8 @@ const NAME_MAX = 32;
 const BIO_MAX = 1024;
 const BGP_MAX_SIZE = 1024 * 1024 * 2; // 2 MiB
 const PFP_MAX_SIZE = 1024 * 1024 * 1; // 1 MiB
+
+const nProgress = useNProgress();
 
 const props = defineProps<{
   user: User;
@@ -105,6 +108,13 @@ const anyChanges = computed(
 );
 
 const inProgress = ref(false);
+watch(
+  () => inProgress.value,
+  (value) => {
+    if (value) nProgress.start();
+    else nProgress.done();
+  }
+);
 const totalFileSize = computed(() => {
   let size = 0;
   if (bgpFile.value) size += bgpFile.value.size;
@@ -116,6 +126,9 @@ const progress = computed(() => {
   if (!inProgress.value) return 0;
   if (totalFileSize.value === 0) return 0;
   return uploadedTotal.value / totalFileSize.value;
+});
+watch(progress, (value) => {
+  nProgress.progress.value = value;
 });
 
 async function save() {

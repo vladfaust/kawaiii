@@ -6,6 +6,7 @@ import { Dialog, DialogPanel } from "@headlessui/vue";
 import { ref } from "vue";
 import { notify } from "@kyvg/vue3-notification";
 import Spinner from "./util/Spinner.vue";
+import nProgress from "nprogress";
 
 const emit = defineEmits<{
   (event: "close"): void;
@@ -21,6 +22,7 @@ const close = () => {
 enum State {
   Connect,
   Signature,
+  Server,
   Done,
 }
 
@@ -32,7 +34,11 @@ async function login() {
     await connect();
 
     state.value = State.Signature;
-    userId.value = await rest.auth.login(await ensureWeb3Token());
+    const token = await ensureWeb3Token();
+
+    state.value = State.Server;
+    nProgress.start();
+    userId.value = await rest.auth.login(token);
 
     state.value = State.Done;
     notify({
@@ -44,6 +50,8 @@ async function login() {
     console.error(e);
     alert(e.message);
     state.value = undefined;
+  } finally {
+    nProgress.done();
   }
 }
 </script>
@@ -92,10 +100,13 @@ Dialog.relative(
         ) Connect wallet
         .btn.btn-lg.flex.gap-2(v-else-if="state === State.Connect")
           Spinner.h-5
-          span Connecting...
+          span Connecting wallet...
         .btn.btn-lg.flex.gap-2(v-else-if="state === State.Signature")
           Spinner.h-5
-          span Wait for signature...
+          span Waiting for signature...
+        .btn.btn-lg.flex.gap-2(v-else-if="state === State.Server")
+          Spinner.h-5
+          span Injecting love...
         .btn.btn-lg.flex.gap-2(v-else-if="state === State.Done")
           span Logged in!
 
