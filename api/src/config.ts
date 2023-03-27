@@ -17,7 +17,8 @@ class Eth {
     readonly httpRpcUrl: URL,
     readonly wsRpcUrl: URL | undefined,
     readonly privateKey: Buffer,
-    readonly collectibleContractAddress: Buffer
+    readonly collectibleContractAddress: Buffer,
+    readonly collectibleContractDeployBlockNumber: number
   ) {}
 }
 
@@ -72,7 +73,10 @@ const config = new Config(
       ? new URL(requireEnv("ETH_WS_RPC_URL"))
       : undefined,
     toBuffer(requireEnv("ETH_PRIVATE_KEY")),
-    toBuffer(requireEnv("ETH_COLLECTIBLE_CONTRACT_ADDRESS"))
+    toBuffer(requireEnv("ETH_COLLECTIBLE_CONTRACT_ADDRESS")),
+    process.env.ETH_COLLECTIBLE_CONTRACT_DEPLOY_BLOCK_NUMBER
+      ? parseInt(process.env.ETH_COLLECTIBLE_CONTRACT_DEPLOY_BLOCK_NUMBER)
+      : 0
   ),
   new S3(
     requireEnv("S3_ACCESS_KEY_ID"),

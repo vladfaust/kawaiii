@@ -94,6 +94,8 @@ async function ensureUser(address: string): Promise<string> {
   }
 }
 
+const BATCH_LIMIT = 10000;
+
 const iface = KawaiiiCollectible__factory.createInterface();
 const prisma = new PrismaClient();
 
@@ -114,7 +116,7 @@ async function syncHistoricalEvents<T extends BaseEvent>(
 
     const logs = await httpProvider.getLogs({
       fromBlock,
-      toBlock: latestChainBlockNumber,
+      toBlock: Math.min(latestChainBlockNumber, fromBlock + BATCH_LIMIT),
       address: toHex(config.eth.collectibleContractAddress),
       topics: [[topic]],
     });
@@ -214,7 +216,7 @@ async function syncCreateEvents() {
         orderBy: { blockNumber: "desc" },
         select: { blockNumber: true },
       })
-    )?.blockNumber ?? 0;
+    )?.blockNumber ?? config.eth.collectibleContractDeployBlockNumber;
 
   await syncHistoricalEvents<CollectibleCreateEventData>(
     iface.getEventTopic("Create"),
@@ -265,7 +267,7 @@ async function syncMintEvents() {
         orderBy: { blockNumber: "desc" },
         select: { blockNumber: true },
       })
-    )?.blockNumber ?? 0;
+    )?.blockNumber ?? config.eth.collectibleContractDeployBlockNumber;
 
   await syncHistoricalEvents<CollectibleMintEventData>(
     iface.getEventTopic("Mint"),
@@ -382,7 +384,7 @@ async function syncTransferSingleEvents() {
         orderBy: { blockNumber: "desc" },
         select: { blockNumber: true },
       })
-    )?.blockNumber ?? 0;
+    )?.blockNumber ?? config.eth.collectibleContractDeployBlockNumber;
 
   await syncHistoricalEvents<CollectibleTransferEventData>(
     iface.getEventTopic("TransferSingle"),
@@ -437,7 +439,7 @@ async function syncTransferBatchEvents() {
         orderBy: { blockNumber: "desc" },
         select: { blockNumber: true },
       })
-    )?.blockNumber ?? 0;
+    )?.blockNumber ?? config.eth.collectibleContractDeployBlockNumber;
 
   await syncHistoricalEvents<CollectibleTransferEventData>(
     iface.getEventTopic("TransferBatch"),
