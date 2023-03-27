@@ -6,6 +6,7 @@ import { trpc } from "@/services/api";
 import { Deferred } from "@/util/deferred";
 import {
   computed,
+  markRaw,
   onMounted,
   ref,
   shallowRef,
@@ -14,7 +15,6 @@ import {
 } from "vue";
 import ContentCard from "./Collectible/Content/Card.vue";
 import CollectiblePost from "./Collectible/Post.vue";
-import Markdown from "vue3-markdown-it";
 import GalleryModal from "./GalleryModal.vue";
 import { loginModal, logout, userId } from "@/modules/auth";
 import EditModal from "./Profile/EditModal.vue";
@@ -26,6 +26,7 @@ import { useImage } from "@vueuse/core";
 import { CheckBadgeIcon } from "@heroicons/vue/20/solid";
 import nProgress from "nprogress";
 
+const Markdown = ref<ReturnType<typeof import("vue3-markdown-it")>>();
 const { user } = defineProps<{
   user: Deferred<User | null>;
 }>();
@@ -121,43 +122,51 @@ const tab = ref(Tab.Created);
 onMounted(async () => {
   await user.promise;
 
+  const promises = [
+    import("vue3-markdown-it").then((module) => {
+      Markdown.value = markRaw(module.default);
+    }),
+  ];
+
   if (user.value) {
-    const promises = [
-      trpc.commands.collectibles.listByCreator
-        .query({ creatorId: user.value.id })
-        .then((ids) =>
-          ids.forEach((id) =>
-            Collectible.get(toUint8Array(id)).then((c) => {
-              created.value.push(c);
-              triggerRef(created);
-            })
-          )
-        ),
+    promises.push(
+      ...[
+        trpc.commands.collectibles.listByCreator
+          .query({ creatorId: user.value.id })
+          .then((ids) =>
+            ids.forEach((id) =>
+              Collectible.get(toUint8Array(id)).then((c) => {
+                created.value.push(c);
+                triggerRef(created);
+              })
+            )
+          ),
 
-      trpc.commands.collectibles.listLiked
-        .query({ userId: user.value.id })
-        .then((ids) =>
-          ids.forEach((id) =>
-            Collectible.get(toUint8Array(id)).then((c) => {
-              liked.value.push(c);
-              triggerRef(liked);
-            })
-          )
-        ),
+        trpc.commands.collectibles.listLiked
+          .query({ userId: user.value.id })
+          .then((ids) =>
+            ids.forEach((id) =>
+              Collectible.get(toUint8Array(id)).then((c) => {
+                liked.value.push(c);
+                triggerRef(liked);
+              })
+            )
+          ),
 
-      trpc.commands.collectibles.indexCollected
-        .query({
-          userId: user.value.id,
-        })
-        .then((ids) =>
-          ids.forEach((id) =>
-            Collectible.get(toUint8Array(id)).then((collectible) => {
-              collected.value.push(collectible);
-              triggerRef(collected);
-            })
-          )
-        ),
-    ];
+        trpc.commands.collectibles.indexCollected
+          .query({
+            userId: user.value.id,
+          })
+          .then((ids) =>
+            ids.forEach((id) =>
+              Collectible.get(toUint8Array(id)).then((collectible) => {
+                collected.value.push(collectible);
+                triggerRef(collected);
+              })
+            )
+          ),
+      ]
+    );
 
     if (isSelf.value) {
       promises.push(
@@ -268,7 +277,7 @@ onMounted(async () => {
               span.text-base-500 &nbsp;likes
             Placeholder.h-4.w-16.rounded.bg-base-100(v-else)
 
-          template(v-if="user.value")
+          template(v-if="user.value && Markdown")
             Markdown.prose.flex.flex-col.leading-tight(
               v-if="user.value.bio"
               :source="user.value.bio"

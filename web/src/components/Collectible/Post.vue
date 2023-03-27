@@ -2,8 +2,7 @@
 import Collectible from "@/model/Collectible";
 import Content from "@/model/Collectible/Content";
 import { formatDistanceToNow } from "date-fns";
-import { computed, ref } from "vue";
-import Markdown from "vue3-markdown-it";
+import { computed, markRaw, ref } from "vue";
 import ContentCard from "./Content/Card.vue";
 import { useElementSize, useImage } from "@vueuse/core";
 import CollectButton from "./CollectButton.vue";
@@ -13,6 +12,11 @@ import { toHex } from "@/util";
 import Placeholder from "../util/Placeholder.vue";
 import { CheckBadgeIcon } from "@heroicons/vue/20/solid";
 import { loginModal, userId } from "@/modules/auth";
+
+const Markdown = ref<ReturnType<typeof import("vue3-markdown-it")>>();
+import("vue3-markdown-it").then((module) => {
+  Markdown.value = markRaw(module.default);
+});
 
 const { collectible, showGallery, showActions, showDescription } = defineProps<{
   collectible: Collectible;
@@ -119,7 +123,7 @@ function checkLoggedIn() {
     .flex.flex-col
       span.text-lg.font-semibold.leading-tight {{ collectible.name }}
       Markdown.leading-tight(
-        v-if="collectible.description && showDescription"
+        v-if="collectible.description && showDescription && Markdown"
         :source="collectible.description"
         :breaks="true"
       )
