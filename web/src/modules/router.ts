@@ -10,6 +10,7 @@ const router = createRouter({
       path: "/",
       name: "Home",
       component: () => import("@/components/Home.vue"),
+      meta: { doNotTerminateNProgress: true },
     },
     {
       path: "/help",
@@ -37,6 +38,7 @@ const router = createRouter({
           user: Deferred.from(User.get(userId.value!)),
         };
       },
+      meta: { doNotTerminateNProgress: true },
     },
     {
       name: "Profile",
@@ -47,6 +49,7 @@ const router = createRouter({
           user: Deferred.from(User.lookup(route.params.handle as string)),
         };
       },
+      meta: { doNotTerminateNProgress: true },
     },
   ],
 });

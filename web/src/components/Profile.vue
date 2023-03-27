@@ -17,6 +17,7 @@ import { toHex, toUint8Array } from "@/util";
 import Placeholder from "./util/Placeholder.vue";
 import { useImage } from "@vueuse/core";
 import { CheckBadgeIcon } from "@heroicons/vue/20/solid";
+import nProgress from "nprogress";
 
 const { user } = defineProps<{
   user: Deferred<User | null>;
@@ -35,46 +36,56 @@ const followeesCount = ref(0);
 const isSelf = computed(() => user.value?.id == userId.value);
 
 if (user.value) {
-  trpc.commands.collectibles.listByCreator
-    .query({ creatorId: user.value.id })
-    .then((ids) =>
-      ids.forEach((id) =>
-        Collectible.get(toUint8Array(id)).then((c) => {
-          created.value.push(c);
-          triggerRef(created);
-        })
-      )
-    );
+  const promises = [
+    trpc.commands.collectibles.listByCreator
+      .query({ creatorId: user.value.id })
+      .then((ids) =>
+        ids.forEach((id) =>
+          Collectible.get(toUint8Array(id)).then((c) => {
+            created.value.push(c);
+            triggerRef(created);
+          })
+        )
+      ),
 
-  trpc.commands.collectibles.listLiked
-    .query({ userId: user.value.id })
-    .then((ids) =>
-      ids.forEach((id) =>
-        Collectible.get(toUint8Array(id)).then((c) => {
-          liked.value.push(c);
-          triggerRef(liked);
-        })
-      )
-    );
+    trpc.commands.collectibles.listLiked
+      .query({ userId: user.value.id })
+      .then((ids) =>
+        ids.forEach((id) =>
+          Collectible.get(toUint8Array(id)).then((c) => {
+            liked.value.push(c);
+            triggerRef(liked);
+          })
+        )
+      ),
 
-  trpc.commands.collectibles.indexCollected
-    .query({
-      userId: user.value.id,
-    })
-    .then((ids) =>
-      ids.forEach((id) =>
-        Collectible.get(toUint8Array(id)).then((collectible) => {
-          collected.value.push(collectible);
-          triggerRef(collected);
-        })
-      )
-    );
+    trpc.commands.collectibles.indexCollected
+      .query({
+        userId: user.value.id,
+      })
+      .then((ids) =>
+        ids.forEach((id) =>
+          Collectible.get(toUint8Array(id)).then((collectible) => {
+            collected.value.push(collectible);
+            triggerRef(collected);
+          })
+        )
+      ),
+  ];
 
   if (isSelf.value) {
-    trpc.commands.users.getFolloweesCount.query().then((count) => {
-      followeesCount.value = count;
-    });
+    promises.push(
+      trpc.commands.users.getFolloweesCount.query().then((count) => {
+        followeesCount.value = count;
+      })
+    );
   }
+
+  await Promise.all(promises).then(() => {
+    nProgress.done();
+  });
+} else {
+  nProgress.done();
 }
 
 const bgpSrc = computed(() =>

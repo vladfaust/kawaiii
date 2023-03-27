@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { loginModal } from "@/modules/auth";
+import nProgress from "nprogress";
+import { onMounted } from "vue";
 
 const imageSources = [
   "/landing/03ac50eb15af3213d0691d060e27b5d3.jpg",
@@ -24,6 +26,10 @@ function pickRandomImages(length: number) {
   }
   return Array.from(images);
 }
+
+onMounted(() => {
+  nProgress.done();
+});
 </script>
 
 <template lang="pug">

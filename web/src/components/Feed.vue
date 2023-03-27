@@ -4,6 +4,7 @@ import Content from "@/model/Collectible/Content";
 import User from "@/model/User";
 import { trpc } from "@/services/api";
 import { toHex, toUint8Array } from "@/util";
+import nProgress from "nprogress";
 import { onMounted, shallowRef } from "vue";
 import Post from "./Collectible/Post.vue";
 import GalleryModal from "./GalleryModal.vue";
@@ -12,19 +13,25 @@ const feed = shallowRef<Collectible[]>([]);
 const subscriptions = shallowRef<User[]>([]);
 
 onMounted(() => {
-  trpc.commands.users.feed
-    .query()
-    .then((ids) => ids.map((id) => Collectible.get(toUint8Array(id))))
-    .then(async (collectibles) => {
-      feed.value = await Promise.all(collectibles);
-    });
+  const promises = [
+    trpc.commands.users.feed
+      .query()
+      .then((ids) => ids.map((id) => Collectible.get(toUint8Array(id))))
+      .then(async (collectibles) => {
+        feed.value = await Promise.all(collectibles);
+      }),
 
-  trpc.commands.users.getFollowees
-    .query()
-    .then((ids) => ids.map((id) => User.get(id)))
-    .then(async (users) => {
-      subscriptions.value = await Promise.all(users);
-    });
+    trpc.commands.users.getFollowees
+      .query()
+      .then((ids) => ids.map((id) => User.get(id)))
+      .then(async (users) => {
+        subscriptions.value = await Promise.all(users);
+      }),
+  ];
+
+  Promise.all(promises).then(() => {
+    nProgress.done();
+  });
 });
 
 const galleryCollectible = shallowRef<Collectible | undefined>();
