@@ -7,6 +7,7 @@ import konsole from "@/services/konsole";
 import config from "@/config";
 import rest from "./server/rest";
 import cookieParser from "cookie-parser";
+import Sentry from "@/services/sentry";
 
 export function listen() {
   const app = express();
@@ -27,6 +28,12 @@ export function listen() {
     trpcExpress.createExpressMiddleware({
       router: commandsRouter,
       createContext: createExpressContext,
+      onError: ({ error }) => {
+        if (error.code === "INTERNAL_SERVER_ERROR") {
+          konsole.error(error);
+          Sentry.captureException(error);
+        }
+      },
     })
   );
 

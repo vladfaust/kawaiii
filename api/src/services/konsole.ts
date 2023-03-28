@@ -20,14 +20,15 @@ function prefix(level: LogLevel): string {
   }
 }
 
-function log(message: string, ...optionalParams: any[]): void {
+function log(message?: any, ...optionalParams: any[]): void {
   console.log(prefix(LogLevel.LOG) + message, ...optionalParams);
 }
-function warn(message: string, ...optionalParams: any[]): void {
+
+function warn(message?: any, ...optionalParams: any[]): void {
   console.warn(prefix(LogLevel.WARN) + message, ...optionalParams);
 }
 
-function error(message: string, ...optionalParams: any[]): void {
+function error(message?: any, ...optionalParams: any[]): void {
   console.error(prefix(LogLevel.ERROR) + message, ...optionalParams);
 }
 
