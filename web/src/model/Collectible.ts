@@ -1,10 +1,7 @@
 import config from "@/config";
 import { trpc } from "@/services/api";
 import { account } from "@/services/eth";
-import {
-  balanceOfCollectible,
-  totalSupplyOfCollectible,
-} from "@/services/eth/collectible";
+import { balanceOfCollectible } from "@/services/eth/collectible";
 import { toHex, toUint8Array } from "@/util";
 import { Deferred } from "@/util/deferred";
 import { Buffer, bufferToUint8Array } from "@/util/prisma";
@@ -133,14 +130,11 @@ export default class Collectible {
   }
 
   async fetchTotalSupply() {
-    const [real, fake] = await Promise.all([
-      totalSupplyOfCollectible(this.id),
-      trpc.commands.collectibles.getFakeEditionsCount.query({
+    this.totalSupply.value = await trpc.commands.collectibles.getEditions
+      .query({
         collectibleId: toHex(this.id),
-      }),
-    ]);
-
-    this.totalSupply.value = real.add(fake);
+      })
+      .then((data) => BigNumber.from(bufferToUint8Array(data)));
   }
 
   private constructor(

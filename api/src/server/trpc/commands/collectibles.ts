@@ -2,7 +2,7 @@ import { t } from "#trpc";
 
 import create from "./collectibles/create";
 import get from "./collectibles/get";
-import getFakeEditionsCount from "./collectibles/getFakeEditionsCount";
+import getEditions from "./collectibles/getEditions";
 import getLikesCount from "./collectibles/getLikesCount";
 import indexCollected from "./collectibles/indexCollected";
 import isLikedByMe from "./collectibles/isLikedByMe";
@@ -14,7 +14,7 @@ import unlike from "./collectibles/unlike";
 export default t.router({
   create,
   get,
-  getFakeEditionsCount,
+  getEditions,
   getLikesCount,
   indexCollected,
   isLikedByMe,
