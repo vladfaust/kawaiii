@@ -18,7 +18,8 @@ class Eth {
     readonly wsRpcUrl: URL | undefined,
     readonly privateKey: Buffer,
     readonly collectibleContractAddress: Buffer,
-    readonly collectibleContractDeployBlockNumber: number
+    readonly collectibleContractDeployBlockNumber: number,
+    readonly chainlinkAddress?: Buffer
   ) {}
 }
 
@@ -76,7 +77,10 @@ const config = new Config(
     toBuffer(requireEnv("ETH_COLLECTIBLE_CONTRACT_ADDRESS")),
     process.env.ETH_COLLECTIBLE_CONTRACT_DEPLOY_BLOCK_NUMBER
       ? parseInt(process.env.ETH_COLLECTIBLE_CONTRACT_DEPLOY_BLOCK_NUMBER)
-      : 0
+      : 0,
+    process.env.ETH_CHAINLINK_ADDRESS
+      ? toBuffer(requireEnv("ETH_CHAINLINK_ADDRESS"))
+      : undefined
   ),
   new S3(
     requireEnv("S3_ACCESS_KEY_ID"),
@@ -95,5 +99,11 @@ const config = new Config(
       )
     : undefined
 );
+
+if (!config.eth.chainlinkAddress) {
+  if (config.prod) {
+    throw new Error("Chainlink address is not set in production");
+  }
+}
 
 export default config;

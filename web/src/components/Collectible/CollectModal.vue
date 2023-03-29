@@ -20,6 +20,7 @@ import Callout from "@/components/util/Callout.vue";
 import { CheckBadgeIcon } from "@heroicons/vue/20/solid";
 import { notify } from "@kyvg/vue3-notification";
 import { loginModal, userId } from "@/modules/auth";
+import { ethPrice } from "@/services/api";
 
 const { collectible, open } = defineProps<{
   collectible: Collectible;
@@ -150,6 +151,7 @@ Dialog.relative.z-40(
             | 🍃 Mint {{ collectible.collected.value ? "more " : "" }}for
             | {{ ethers.utils.formatEther(collectible.mintPrice) }}
             | {{ config.eth.chain.nativeCurrency.symbol }}
+            | ~ ${{ (collectible.mintPrice.div(ethers.utils.parseEther("1")).toNumber() * ethPrice).toFixed(0) }}
           .btn.btn-lg.btn-ghost(v-else)
             .flex.items-center.gap-2(v-if="stage === Stage.SendingTx")
               Spinner.h-4.animate-spin

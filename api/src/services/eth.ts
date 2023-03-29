@@ -1,9 +1,10 @@
 import config from "@/config.js";
 import { BigNumber, ethers } from "ethers";
-import { timeout } from "@/utils.js";
+import { timeout, toHex } from "@/utils.js";
 import assert from "assert";
 import konsole from "./konsole";
 import { ERC1155__factory } from "@kawaiiico/contracts/typechain";
+import ChainlinkAbi from "@/abi/Chainlink.json" assert { type: "json" };
 
 let wsProvider: ethers.providers.BaseProvider;
 let httpProvider: ethers.providers.BaseProvider;
@@ -109,4 +110,21 @@ export async function balanceOfCollectible(
     tokenId,
     account
   );
+}
+
+/**
+ * Query Chainlink contract for latest price of ETH/USD.
+ */
+export async function latestPrice(): Promise<number> {
+  if (!config.eth.chainlinkAddress) return Math.PI;
+
+  const contract = new ethers.Contract(
+    toHex(config.eth.chainlinkAddress),
+    ChainlinkAbi,
+    httpProvider
+  );
+
+  const latestRound = await contract.latestRoundData();
+
+  return latestRound.answer.toNumber() / 10 ** 8;
 }

@@ -7,7 +7,7 @@ import config from "@/config";
 import prettyBytes from "pretty-bytes";
 import { QuestionMarkCircleIcon } from "@heroicons/vue/20/solid";
 import { provider } from "@/services/eth";
-import { trpc } from "@/services/api";
+import { ethPrice, trpc } from "@/services/api";
 import { random } from "nanoid";
 import { ethers } from "ethers";
 import { Dialog, DialogPanel } from "@headlessui/vue";
@@ -450,10 +450,10 @@ onUnmounted(() => {
   .grid.w-full.gap-3.sm_grid-cols-3
     .flex.flex-col.gap-2
       .flex.items-center.gap-2
-        label.label.shrink-0 Price ({{ config.eth.chain.nativeCurrency.symbol }}) 🤑
+        label.label.shrink-0 Mint price (~${{ ((priceEth || 0) * ethPrice).toFixed(2) }}) 💰
         .h-px.w-full.bg-base-100
         span.shrink-0.cursor-help.leading-none.text-base-200.hover_text-base-400(
-          v-tippy="'Price for minting a single collectible edition.'"
+          v-tippy="{ content: `Price for minting a single collectible edition, in ${config.eth.chain.nativeCurrency.symbol}.` }"
         ) ❓
 
       input.input(

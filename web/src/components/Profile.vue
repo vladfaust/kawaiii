@@ -3,6 +3,7 @@ import Collectible from "@/model/Collectible";
 import Content from "@/model/Collectible/Content";
 import User from "@/model/User";
 import { trpc } from "@/services/api";
+import * as api from "@/services/api";
 import { Deferred } from "@/util/deferred";
 import {
   computed,
@@ -26,7 +27,6 @@ import { useImage } from "@vueuse/core";
 import { CheckBadgeIcon } from "@heroicons/vue/20/solid";
 import nProgress from "nprogress";
 import { BigNumber, ethers } from "ethers";
-import config from "@/config";
 
 const Markdown = ref<ReturnType<typeof import("vue3-markdown-it")>>();
 const { user } = defineProps<{
