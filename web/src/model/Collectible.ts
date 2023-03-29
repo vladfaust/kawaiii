@@ -24,6 +24,9 @@ export default class Collectible {
   readonly capReached = computed(() =>
     this.totalSupply.value.gte(this.editions)
   );
+  readonly totalValue = computed(() =>
+    this.totalSupply.value.mul(this.mintPrice)
+  );
 
   private _content: Content[];
 

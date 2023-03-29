@@ -10,6 +10,7 @@ import getFolloweesCount from "./users/getFolloweesCount";
 import getFollowersCount from "./users/getFollowersCount";
 import getLikesToCount from "./users/getLikesToCount";
 import getPfpUploadUrl from "./users/getPfpUploadUrl";
+import getValue from "./users/getValue";
 import isFollowing from "./users/isFollowing";
 import lookup from "./users/lookup";
 import unfollow from "./users/unfollow";
@@ -26,6 +27,7 @@ export default t.router({
   getFollowersCount,
   getLikesToCount,
   getPfpUploadUrl,
+  getValue,
   isFollowing,
   lookup,
   unfollow,

@@ -25,6 +25,8 @@ import Placeholder from "./util/Placeholder.vue";
 import { useImage } from "@vueuse/core";
 import { CheckBadgeIcon } from "@heroicons/vue/20/solid";
 import nProgress from "nprogress";
+import { BigNumber, ethers } from "ethers";
+import config from "@/config";
 
 const Markdown = ref<ReturnType<typeof import("vue3-markdown-it")>>();
 const { user } = defineProps<{
@@ -39,6 +41,14 @@ const galleryContent = shallowRef<Content | undefined>();
 const created: ShallowRef<Collectible[]> = shallowRef([]);
 const liked: ShallowRef<Collectible[]> = shallowRef([]);
 const collected: ShallowRef<Collectible[]> = shallowRef([]);
+
+const totalCreatedValue = ref<BigNumber | undefined>();
+const totalCreatedValueUSD = computed(() =>
+  totalCreatedValue.value
+    ? totalCreatedValue.value.div(ethers.utils.parseEther("1")).toNumber() *
+      api.ethPrice.value
+    : undefined
+);
 
 const followeesCount = ref(0);
 const isSelf = computed(() => user.value?.id == userId.value);
@@ -165,6 +175,12 @@ onMounted(async () => {
               })
             )
           ),
+
+        trpc.commands.users.getValue
+          .query({ userId: user.value.id })
+          .then((value) => {
+            totalCreatedValue.value = BigNumber.from(value);
+          }),
       ]
     );
 
@@ -252,7 +268,15 @@ onMounted(async () => {
               span.text.italic.leading-none.text-base-400(v-else) @undefined
             Placeholder.h-4.w-32.rounded.bg-base-100(v-else)
 
-          .flex.gap-2
+          .flex.items-center.gap-2
+            span.cursor-help(
+              v-if="user.value && totalCreatedValueUSD !== undefined"
+              v-tippy="'Total value from minted collectibles'"
+            )
+              span.font-semibold ~${{ totalCreatedValueUSD.toFixed(2) }}
+              span.text-base-500 &nbsp;value
+            Placeholder.h-4.w-16.rounded.bg-base-100(v-else)
+
             span(v-if="user.value")
               span.font-semibold {{ user.value.collectorsCount.value }}
               span.text-base-500 &nbsp;collectors
