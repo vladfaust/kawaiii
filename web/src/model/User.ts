@@ -55,6 +55,7 @@ export default class User {
     verified: boolean;
     name: string | null;
     bio: string | null;
+    links: string;
     pfpVersion: number;
     bgpVersion: number;
   }): User {
@@ -65,6 +66,7 @@ export default class User {
         data.verified,
         data.name ?? "",
         data.bio ?? "",
+        JSON.parse(data.links) as string[],
         data.pfpVersion,
         data.bgpVersion
       )
@@ -77,6 +79,7 @@ export default class User {
     readonly verified: boolean,
     readonly name: string,
     readonly bio: string,
+    readonly links: string[],
     readonly pfpVersion: number,
     readonly bgpVersion: number
   ) {

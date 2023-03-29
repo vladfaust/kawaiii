@@ -8,6 +8,8 @@ import { uploadFile } from "@/modules/axios";
 import Spinner from "../util/Spinner.vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { useNProgress } from "@vueuse/integrations/useNProgress";
+import { PlusCircleIcon, TrashIcon } from "@heroicons/vue/24/outline";
+import { arraysEqual } from "@/util";
 
 const HANDLE_MIN = 8;
 const HANDLE_MAX = 32;
@@ -67,6 +69,13 @@ const handleAvailable = computedAsync(
 const bio = ref<string>(props.user.bio);
 const bioValid = computed(() => bio.value.length <= BIO_MAX);
 
+const links = ref<string[]>([...props.user.links]);
+const linksValid = computed(() =>
+  links.value.every(
+    (link) => link.length <= 256 && link.match(/^https?:\/\/.+/)
+  )
+);
+
 const bgpError = ref(false);
 const bgpFileDialog = useFileDialog({
   accept: "image/*",
@@ -95,6 +104,7 @@ const valid = computed(
     handleValid.value &&
     bioValid.value &&
     bgpValid.value &&
+    linksValid.value &&
     pfpValid.value
 );
 
@@ -103,6 +113,7 @@ const anyChanges = computed(
     name.value !== props.user.name ||
     handle.value !== props.user.handle ||
     bio.value !== props.user.bio ||
+    !arraysEqual(links.value, props.user.links) ||
     bgpFile.value ||
     pfpFile.value
 );
@@ -141,7 +152,8 @@ async function save() {
   if (
     name.value !== props.user.name ||
     handle.value !== props.user.handle ||
-    bio.value !== props.user.bio
+    bio.value !== props.user.bio ||
+    !arraysEqual(links.value, props.user.links)
   ) {
     promises.push(
       trpc.commands.users.update.mutate({
@@ -149,6 +161,9 @@ async function save() {
           handle.value !== props.user.handle ? handle.value || null : undefined,
         name: name.value !== props.user.name ? name.value || null : undefined,
         bio: bio.value !== props.user.bio ? bio.value || null : undefined,
+        links: !arraysEqual(links.value, props.user.links)
+          ? links.value
+          : undefined,
       })
     );
   }
@@ -347,9 +362,28 @@ Dialog.relative.z-40(:open="open" @close="onClose")
             placeholder="Your bio"
             v-model="bio"
             :max="BIO_MAX"
-            rows="5"
+            rows="2"
             :class="{ 'border-red-500': !bioValid }"
           )
+
+          .flex.items-center.justify-between.gap-2
+            label.label.shrink-0.leading-none Links
+            .h-px.w-full.bg-base-100
+            .flex.shrink-0.leading-none
+              PlusCircleIcon.pressable.h-5.cursor-pointer.text-primary-500(
+                @click="links.push('')"
+              )
+
+          ul.flex.flex-col.gap-2
+            li.flex.items-center.gap-1(v-for="(link, i) in links")
+              input.input.text-sm(
+                type="url"
+                v-model="links[i]"
+                :placeholder="`Link ${i + 1}`"
+              )
+              TrashIcon.pressable.h-5.cursor-pointer.text-base-500.hover_text-error-500(
+                @click="links.splice(i, 1)"
+              )
 
           button.btn.btn-primary.btn-lg(
             @click="save"

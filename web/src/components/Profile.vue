@@ -27,6 +27,9 @@ import { useImage } from "@vueuse/core";
 import { CheckBadgeIcon } from "@heroicons/vue/20/solid";
 import nProgress from "nprogress";
 import { BigNumber, ethers } from "ethers";
+import { LinkIcon } from "@heroicons/vue/24/solid";
+import TwitterIcon from "@/assets/icon/twitter.svg?component";
+import InstagramIcon from "@/assets/icon/instagram.svg?component";
 
 const Markdown = ref<ReturnType<typeof import("vue3-markdown-it")>>();
 const { user } = defineProps<{
@@ -199,6 +202,20 @@ onMounted(async () => {
     nProgress.done();
   }
 });
+
+function prettyUrl(url: string) {
+  if (asTwitter(url)) return asTwitter(url)!.groups!["id"];
+  else if (asInstagram(url)) return asInstagram(url)!.groups!["id"];
+  else return url.replace(/^https?:\/\//, "");
+}
+
+function asTwitter(url: string) {
+  return url.match(/^https?:\/\/twitter.com\/(?<id>\w+)$/);
+}
+
+function asInstagram(url: string) {
+  return url.match(/^https?:\/\/instagram.com\/(?<id>[\w\.]+)$/);
+}
 </script>
 
 <template lang="pug">
@@ -311,6 +328,16 @@ onMounted(async () => {
             Placeholder.h-4.w-full.rounded.bg-base-100
             Placeholder.h-4.w-full.rounded.bg-base-100
             Placeholder.h-4.w-full.rounded.bg-base-100
+
+          ul.flex.gap-2(v-if="user.value && user.value.links.length")
+            li.flex.items-center.gap-1.text-base-600.hover_text-inherit(
+              v-for="link in user.value.links"
+            )
+              TwitterIcon.h-4(v-if="asTwitter(link)")
+              InstagramIcon.h-4(v-else-if="asInstagram(link)")
+              LinkIcon.h-4.align-text-top(v-else)
+              a.link-hover.text-sm(:href="link") {{ prettyUrl(link) }}
+          Placeholder.h-4.w-full.rounded.bg-base-100(v-else-if="!user.value")
 
       template(v-if="created.length")
         .flex.items-center.justify-between.gap-3

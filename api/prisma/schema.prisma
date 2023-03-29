@@ -19,6 +19,7 @@ model User {
 
   name       String?
   bio        String?
+  links      String  @default("[]") // JSON array
   evmAddress Bytes   @unique @map("address")
 
   bgpVersion Int @default(0)

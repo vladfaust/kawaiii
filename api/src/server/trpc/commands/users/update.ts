@@ -5,20 +5,22 @@ import { TRPCError } from "@trpc/server";
 
 const prisma = new PrismaClient();
 
-// TODO: Should not return anything.
 export default protectedProcedure
   .input(
     z.object({
       handle: z.string().min(8).max(32).nullable().optional(),
       name: z.string().min(1).max(32).nullable().optional(),
       bio: z.string().max(1024).nullable().optional(),
+      links: z.array(z.string().max(1024)).optional(),
     })
   )
+  .output(z.void())
   .mutation(async ({ input, ctx }) => {
     if (
       input.handle === undefined &&
       input.name === undefined &&
-      input.bio === undefined
+      input.bio === undefined &&
+      input.links === undefined
     ) {
       throw new TRPCError({
         code: "BAD_REQUEST",
@@ -28,24 +30,14 @@ export default protectedProcedure
 
     const verified = input.handle !== undefined ? false : undefined;
 
-    const user = await prisma.user.update({
+    await prisma.user.update({
       where: { id: ctx.user.id },
       data: {
         handle: input.handle,
         verified,
         name: input.name,
         bio: input.bio,
-      },
-      select: {
-        id: true,
-        handle: true,
-        verified: true,
-        name: true,
-        bio: true,
-        pfpVersion: true,
-        bgpVersion: true,
+        links: input.links ? JSON.stringify(input.links) : undefined,
       },
     });
-
-    return user;
   });

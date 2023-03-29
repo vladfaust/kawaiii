@@ -22,6 +22,7 @@ export default t.procedure
         verified: true,
         name: true,
         bio: true,
+        links: true,
         pfpVersion: true,
         bgpVersion: true,
       },
