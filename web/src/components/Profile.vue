@@ -54,7 +54,7 @@ const totalCreatedValueUSD = computed(() =>
 );
 
 const followeesCount = ref(0);
-const isSelf = computed(() => user.value?.id == userId.value);
+const isSelf = computed(() => userId.value && user.value?.id === userId.value);
 
 const bgpSrc = computed(() =>
   user.value?.bgpVersion ? user.value.bgpUrl.toString() : undefined
