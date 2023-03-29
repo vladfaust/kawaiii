@@ -1,10 +1,12 @@
 import config from "@/config";
+import { userId } from "@/modules/auth";
 import { trpc } from "@/services/api";
 import { account } from "@/services/eth";
 import { balanceOfCollectible } from "@/services/eth/collectible";
 import { toHex, toUint8Array } from "@/util";
 import { Deferred } from "@/util/deferred";
 import { Buffer, bufferToUint8Array } from "@/util/prisma";
+import { asyncComputed } from "@vueuse/core";
 import { BigNumber } from "ethers";
 import { computed, markRaw, ref, Ref, watch } from "vue";
 import Content from "./Collectible/Content";
@@ -14,7 +16,15 @@ export default class Collectible {
   static idMap = new Map<string, Deferred<Collectible>>();
 
   readonly likes = ref(0);
-  readonly likedByMe = ref(false);
+
+  readonly likedByMe = asyncComputed(async () => {
+    if (!userId.value) return false;
+
+    return trpc.commands.collectibles.isLikedByMe.query({
+      collectibleId: toHex(this.id),
+    });
+  });
+
   readonly totalSupply: Ref<BigNumber> = ref(BigNumber.from(0));
   readonly balance: Ref<BigNumber> = ref(BigNumber.from(0));
   readonly collected = computed(() => this.balance.value.gt(0));
@@ -109,14 +119,6 @@ export default class Collectible {
       })
       .then((data) => {
         this.likes.value = data;
-      });
-
-    trpc.commands.collectibles.isLikedByMe
-      .query({
-        collectibleId: toHex(this.id),
-      })
-      .then((data) => {
-        this.likedByMe.value = data;
       });
   }
 

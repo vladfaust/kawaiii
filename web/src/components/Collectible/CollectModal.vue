@@ -114,16 +114,17 @@ Dialog.relative.z-40(
               | 👉 Once all of
               strong &nbsp;{{ collectible.editions }}&nbsp;
               | editions are minted, the collectible won't be available to mint anymore.
-              | You can still buy it from the secondary market.
-              | Right now,
               |
-              strong {{ collectible.totalSupply.value }}
-              |
-              | of
-              |
-              strong {{ collectible.editions }}
-              |
-              | editions are minted.
+              span(v-if="collectible.totalSupply.value.gt(0)")
+                | Right now,
+                |
+                strong {{ collectible.totalSupply.value }}
+                |
+                | of
+                |
+                strong {{ collectible.editions }}
+                |
+                | editions are minted.
           li(v-if="exclusiveContentLength")
             p.leading-tight
               | 👉 A holder of this collectible gains exclusive access to&nbsp;
